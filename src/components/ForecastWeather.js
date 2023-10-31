@@ -35,7 +35,9 @@ export default function ForecastWeather({ forecastArray }) {
               },
             ]}
           >
-            <Text style={styles.weatherText}>{item.temperature}°C</Text>
+            <Text style={styles.weatherText}>
+              {item.temperature.temp_min}° - {item.temperature.temp_max}°
+            </Text>
           </View>
         </View>
       ))}
