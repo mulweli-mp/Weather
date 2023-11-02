@@ -10,7 +10,7 @@ export default function LoadingAnimation() {
 
 const styles = StyleSheet.create({
   container: {
-    // backgroundColor: "white",
+    backgroundColor: "#303030",
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
