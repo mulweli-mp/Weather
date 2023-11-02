@@ -8,6 +8,7 @@ import {
   TodaysWather,
   ForecastWeather,
   LoadingAnimation,
+  LocationPermision,
 } from "../components";
 
 export default function Home({ navigation }) {
@@ -19,6 +20,8 @@ export default function Home({ navigation }) {
   const [minTemperature, setMinTemperature] = useState(10);
   const [maxTemperature, setMaxTemperature] = useState(17);
   const [forecastArray, setForecastArray] = useState([]);
+
+  const [isFetchingLocation, setIsFetchingLocation] = useState(true);
 
   const weatherImages = {
     sea: {
@@ -33,12 +36,8 @@ export default function Home({ navigation }) {
     },
   };
 
-  useEffect(() => {
-    const latitude = -25.75142045181422;
-    const longitude = 28.204730442243164;
-    fetchWeatherData(latitude, longitude);
-    fetchFiveDayWeatherForecast(latitude, longitude);
-  }, []);
+  // useEffect(() => {
+  //  }, []);
 
   const weatherCategories = {
     Clear: "sunny",
@@ -172,6 +171,16 @@ export default function Home({ navigation }) {
       setIsLoadingForecast(false);
     }
   };
+
+  const fetchWeatherForecast = (latitude, longitude) => {
+    setIsFetchingLocation(false);
+    fetchWeatherData(latitude, longitude);
+    fetchFiveDayWeatherForecast(latitude, longitude);
+  };
+
+  if (isFetchingLocation) {
+    return <LocationPermision fetchWeatherForecast={fetchWeatherForecast} />;
+  }
 
   if (isLoadingCurrent || isLoadingForecast) {
     return <LoadingAnimation />;
