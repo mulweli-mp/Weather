@@ -1,5 +1,12 @@
 import { useContext, useState, useEffect } from "react";
-import { StyleSheet, Text, View, ImageBackground, Modal } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ImageBackground,
+  Modal,
+  TouchableOpacity,
+} from "react-native";
 import { OPEN_WEATHER_API_KEY } from "@env";
 import { StatusBar } from "expo-status-bar";
 
@@ -18,7 +25,7 @@ export default function Home({ navigation }) {
   const [userWeatherData, updateUserWeatherData] = useContext(UserContext);
   const [isLoadingCurrent, setIsLoadingCurrent] = useState(true);
   const [isLoadingForecast, setIsLoadingForecast] = useState(true);
-  const [currentWeather, setCurrentWeather] = useState("sunny");
+  const [currentWeather, setCurrentWeather] = useState(null);
   const [currentTemperature, setCurrentTemperature] = useState(15);
   const [minTemperature, setMinTemperature] = useState(10);
   const [maxTemperature, setMaxTemperature] = useState(17);
@@ -28,32 +35,49 @@ export default function Home({ navigation }) {
   const [locationModalVisible, setLocationModalVisible] = useState(false);
 
   const [isFetchingLocation, setIsFetchingLocation] = useState(true);
+  const [lastUpdatedTime, setlastUpdatedTime] = useState("Just Now");
 
-  const weatherImages = {
-    sea: {
-      rainy: require("../../assets/Images/sea/rainy.png"),
-      sunny: require("../../assets/Images/sea/sunny.png"),
-      cloudy: require("../../assets/Images/sea/cloudy.png"),
-    },
-    forest: {
-      rainy: require("../../assets/Images/forest/rainy.png"),
-      sunny: require("../../assets/Images/forest/sunny.png"),
-      cloudy: require("../../assets/Images/forest/cloudy.png"),
-    },
-  };
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const minutesDifference = calculateMinutesDifference(
+        currentWeather?.timeUpdated,
+        new Date()
+      );
 
-  // useEffect(() => {
-  //  }, []);
+      if (minutesDifference < 2) {
+        setlastUpdatedTime("Just Now");
+      } else if (minutesDifference > 2 && minutesDifference < 60) {
+        setlastUpdatedTime(`${parseInt(minutesDifference)} mins ago`);
+      } else {
+        const hoursDifference = minutesDifference / 60;
 
-  const weatherCategories = {
-    Clear: "sunny",
-    Rain: "rainy",
-    Drizzle: "rainy",
-    Thunderstorm: "rainy",
-    Clouds: "cloudy",
-    Snow: "cloudy",
-    Mist: "cloudy",
-    Fog: "cloudy",
+        const wording =
+          parseInt(hoursDifference) == 1
+            ? "an hour ago"
+            : `${parseInt(hoursDifference)} hours ago`;
+        setlastUpdatedTime(wording);
+      }
+
+      console.log(`The difference in minutes is: ${minutesDifference} minutes`);
+    }, 1000);
+
+    // Clear the interval when the component unmounts
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [currentWeather]);
+
+  const calculateMinutesDifference = (timestamp1, timestamp2) => {
+    const date1 = new Date(timestamp1);
+    const date2 = new Date(timestamp2);
+
+    // Calculate the time difference in milliseconds
+    const timeDifference = date2 - date1;
+
+    // Convert milliseconds to minutes (1 minute = 60,000 milliseconds)
+    const minutesDifference = timeDifference / 60000;
+
+    return minutesDifference;
   };
 
   const fetchWeatherData = async (
@@ -75,7 +99,6 @@ export default function Home({ navigation }) {
       }
 
       const data = await response.json();
-      // console.log(`data:`, data);
 
       const { main, weather, name } = data;
       const { temp, temp_min, temp_max } = main;
@@ -84,6 +107,7 @@ export default function Home({ navigation }) {
       const general = weatherCategories[weatherMain] || "unknown";
       const placeName = searchQueryPlaceName ? searchQueryPlaceName : name;
       const currentTemp = Math.round(temp);
+      const timeUpdated = new Date();
 
       setCurrentTemperature(currentTemp);
       setMaxTemperature(Math.round(temp_max));
@@ -97,6 +121,8 @@ export default function Home({ navigation }) {
         currentTemp,
         latitude,
         longitude,
+        fetchOrigion,
+        timeUpdated,
       };
 
       setCurrentWeather(weatherData);
@@ -209,6 +235,30 @@ export default function Home({ navigation }) {
     fetchFiveDayWeatherForecast(latitude, longitude);
   };
 
+  const weatherCategories = {
+    Clear: "sunny",
+    Rain: "rainy",
+    Drizzle: "rainy",
+    Thunderstorm: "rainy",
+    Clouds: "cloudy",
+    Snow: "cloudy",
+    Mist: "cloudy",
+    Fog: "cloudy",
+  };
+
+  const weatherImages = {
+    sea: {
+      rainy: require("../../assets/Images/sea/rainy.png"),
+      sunny: require("../../assets/Images/sea/sunny.png"),
+      cloudy: require("../../assets/Images/sea/cloudy.png"),
+    },
+    forest: {
+      rainy: require("../../assets/Images/forest/rainy.png"),
+      sunny: require("../../assets/Images/forest/sunny.png"),
+      cloudy: require("../../assets/Images/forest/cloudy.png"),
+    },
+  };
+
   if (isFetchingLocation) {
     return <LocationPermision fetchWeatherForecast={fetchWeatherForecast} />;
   }
@@ -242,6 +292,24 @@ export default function Home({ navigation }) {
         <Text style={styles.weatherDescriptionText}>
           {currentWeather.description.toUpperCase()}
         </Text>
+        <View style={[styles.lastUpdateContainer]}>
+          <Text style={styles.lastUpdateText}>
+            🕒 Last Updated {lastUpdatedTime}
+          </Text>
+          <TouchableOpacity
+            style={styles.refreshButton}
+            onPress={() => {
+              fetchWeatherForecast(
+                currentWeather.latitude,
+                currentWeather.longitude,
+                currentWeather.fetchOrigion,
+                currentWeather.placeName
+              );
+            }}
+          >
+            <Text style={styles.refreshText}>REFRESH</Text>
+          </TouchableOpacity>
+        </View>
       </ImageBackground>
       <View style={styles.forecastContainer}>
         <TodaysWather
@@ -293,5 +361,34 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     fontSize: 30,
+  },
+  lastUpdateContainer: {
+    backgroundColor: "rgba(163, 163, 163,0.4)",
+    minHeight: "5%",
+    minWidth: "30%",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 10,
+    borderRadius: 7,
+    marginTop: 5,
+  },
+  lastUpdateText: {
+    color: "white",
+    fontWeight: "700",
+    // fontStyle: "italic",
+    marginVertical: 10,
+  },
+  refreshButton: {
+    backgroundColor: "#303030",
+    minHeight: 10,
+    minWidth: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 10,
+    borderRadius: 5,
+  },
+  refreshText: {
+    fontWeight: "bold",
+    color: "white",
   },
 });
