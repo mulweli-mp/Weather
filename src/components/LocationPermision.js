@@ -59,14 +59,12 @@ export default function LocationPermision({ fetchWeatherForecast }) {
   };
 
   const getUserLocation = async () => {
-    // console.log(`getUserLocation:`);
     let location = await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.Balanced,
     });
 
     const { latitude, longitude } = location.coords;
-    fetchWeatherForecast(latitude, longitude);
-    // console.log("location", latitude, longitude);
+    fetchWeatherForecast(latitude, longitude, "currentLocation");
   };
 
   const requestForegroundLocation = async () => {
