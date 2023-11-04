@@ -23,7 +23,9 @@ export default function HomeHeader({
           onPress={() => setLocationModalVisible(true)}
           style={styles.locationButton}
         >
-          <Text style={styles.locationText}>{locationName}</Text>
+          <Text numberOfLines={2} style={styles.locationText}>
+            {locationName}
+          </Text>
           <Ionicons name="ios-chevron-down" size={20} color="white" />
         </TouchableOpacity>
       </View>
@@ -61,6 +63,7 @@ const styles = StyleSheet.create({
     // backgroundColor: "red",
     height: "80%",
     minWidth: "30%",
+    maxWidth: "60%",
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
@@ -69,5 +72,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     fontSize: 18,
+    textAlign: "center",
   },
 });
