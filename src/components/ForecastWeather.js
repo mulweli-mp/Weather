@@ -1,12 +1,7 @@
 import { StyleSheet, Text, View, Image } from "react-native";
+import weatherIcons from "../utilities/WeatherIcons";
 
 export default function ForecastWeather({ forecastArray }) {
-  const weatherIcons = {
-    rainy: require("../../assets/Icons/rainy.png"),
-    sunny: require("../../assets/Icons/sunny.png"),
-    cloudy: require("../../assets/Icons/cloudy.png"),
-  };
-
   return (
     <View style={styles.container}>
       {forecastArray.map((item) => (

@@ -1,0 +1,7 @@
+const weatherIcons = {
+  rainy: require("../../assets/Icons/rainy.png"),
+  sunny: require("../../assets/Icons/sunny.png"),
+  cloudy: require("../../assets/Icons/cloudy.png"),
+};
+
+export default weatherIcons;
