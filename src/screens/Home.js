@@ -1,18 +1,21 @@
 import { useContext, useState, useEffect } from "react";
-import { StyleSheet, Text, View, ImageBackground } from "react-native";
+import { StyleSheet, Text, View, ImageBackground, Modal } from "react-native";
 import { OPEN_WEATHER_API_KEY } from "@env";
+import { StatusBar } from "expo-status-bar";
 
-import { ThemeContext } from "../context/ThemeContext";
+import { ThemeContext, UserContext } from "../context";
 import {
   HomeHeader,
   TodaysWather,
   ForecastWeather,
   LoadingAnimation,
   LocationPermision,
+  EditLocation,
 } from "../components";
 
 export default function Home({ navigation }) {
   const [themeColors] = useContext(ThemeContext);
+  const [userWeatherData, updateUserWeatherData] = useContext(UserContext);
   const [isLoadingCurrent, setIsLoadingCurrent] = useState(true);
   const [isLoadingForecast, setIsLoadingForecast] = useState(true);
   const [currentWeather, setCurrentWeather] = useState("sunny");
@@ -20,6 +23,9 @@ export default function Home({ navigation }) {
   const [minTemperature, setMinTemperature] = useState(10);
   const [maxTemperature, setMaxTemperature] = useState(17);
   const [forecastArray, setForecastArray] = useState([]);
+  const [locationName, setLocationName] = useState("Your location");
+
+  const [locationModalVisible, setLocationModalVisible] = useState(false);
 
   const [isFetchingLocation, setIsFetchingLocation] = useState(true);
 
@@ -50,7 +56,12 @@ export default function Home({ navigation }) {
     Fog: "cloudy",
   };
 
-  const fetchWeatherData = async (latitude, longitude) => {
+  const fetchWeatherData = async (
+    latitude,
+    longitude,
+    fetchOrigion,
+    searchQueryPlaceName
+  ) => {
     const apiUrl = "http://api.openweathermap.org/data/2.5/weather";
     try {
       setIsLoadingCurrent(true);
@@ -64,18 +75,33 @@ export default function Home({ navigation }) {
       }
 
       const data = await response.json();
+      // console.log(`data:`, data);
 
-      const { main, weather } = data;
+      const { main, weather, name } = data;
       const { temp, temp_min, temp_max } = main;
       const { main: weatherMain, description } = weather[0];
 
       const general = weatherCategories[weatherMain] || "unknown";
+      const placeName = searchQueryPlaceName ? searchQueryPlaceName : name;
+      const currentTemp = Math.round(temp);
 
-      setCurrentTemperature(Math.round(temp));
+      setCurrentTemperature(currentTemp);
       setMaxTemperature(Math.round(temp_max));
       setMinTemperature(Math.round(temp_min));
 
-      setCurrentWeather({ general, main: weatherMain, description });
+      const weatherData = {
+        general,
+        main: weatherMain,
+        description,
+        placeName,
+        currentTemp,
+        latitude,
+        longitude,
+      };
+
+      setCurrentWeather(weatherData);
+      setLocationName(placeName);
+      updateUserWeatherData(fetchOrigion, weatherData);
       setIsLoadingCurrent(false);
     } catch (error) {
       console.error("Error fetching weather data:", error);
@@ -172,9 +198,14 @@ export default function Home({ navigation }) {
     }
   };
 
-  const fetchWeatherForecast = (latitude, longitude) => {
+  const fetchWeatherForecast = (
+    latitude,
+    longitude,
+    fetchOrigion,
+    searchQueryPlaceName
+  ) => {
     setIsFetchingLocation(false);
-    fetchWeatherData(latitude, longitude);
+    fetchWeatherData(latitude, longitude, fetchOrigion, searchQueryPlaceName);
     fetchFiveDayWeatherForecast(latitude, longitude);
   };
 
@@ -195,12 +226,18 @@ export default function Home({ navigation }) {
         },
       ]}
     >
+      <StatusBar style="light" />
+
       <ImageBackground
         style={styles.currentWeatherContainer}
         source={weatherImages[themeColors.theme][currentWeather.general]}
         resizeMode="cover"
       >
-        <HomeHeader openDrawer={() => navigation.openDrawer()} />
+        <HomeHeader
+          openDrawer={() => navigation.openDrawer()}
+          locationName={locationName}
+          setLocationModalVisible={setLocationModalVisible}
+        />
         <Text style={styles.temperatureText}>{currentTemperature}°C</Text>
         <Text style={styles.weatherDescriptionText}>
           {currentWeather.description.toUpperCase()}
@@ -214,6 +251,17 @@ export default function Home({ navigation }) {
         />
         <ForecastWeather forecastArray={forecastArray} />
       </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={locationModalVisible}
+      >
+        <EditLocation
+          fetchWeatherForecast={fetchWeatherForecast}
+          setLocationModalVisible={setLocationModalVisible}
+        />
+      </Modal>
     </View>
   );
 }
