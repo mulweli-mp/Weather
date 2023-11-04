@@ -1,13 +1,14 @@
 import Navigator from "./src/navigation/Navigator";
 import { ThemeProvider } from "./src/context/ThemeContext";
-import { StatusBar } from "expo-status-bar";
+import { UserProvider } from "./src/context/UserContext";
 
 function App() {
   return (
-    <ThemeProvider>
-      <Navigator />
-      <StatusBar style="light" />
-    </ThemeProvider>
+    <UserProvider>
+      <ThemeProvider>
+        <Navigator />
+      </ThemeProvider>
+    </UserProvider>
   );
 }
 
