@@ -3,6 +3,8 @@ import TodaysWather from "./TodaysWather";
 import ForecastWeather from "./ForecastWeather";
 import LoadingAnimation from "./LoadingAnimation";
 import LocationPermision from "./LocationPermision";
+import EditLocation from "./EditLocation";
+import CustomStatusBar from "./CustomStatusBar";
 
 export {
   HomeHeader,
@@ -10,4 +12,6 @@ export {
   ForecastWeather,
   LoadingAnimation,
   LocationPermision,
+  EditLocation,
+  CustomStatusBar,
 };
