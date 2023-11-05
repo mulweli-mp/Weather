@@ -1,5 +1,6 @@
 import { useState, createContext, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import getSavedWeatherData from "../utilities/GetSavedWeatherData";
 
 export const UserContext = createContext();
 
@@ -17,16 +18,13 @@ export const UserProvider = (props) => {
   }, []);
 
   const getOfflineWeatherData = async () => {
-    console.log(`Running getOfflineWeatherData`);
     try {
-      const jsonValue = await AsyncStorage.getItem("weather-data");
-      const savedData = jsonValue != null ? JSON.parse(jsonValue) : null;
+      const savedData = await getSavedWeatherData();
       if (savedData) {
         setUserWeatherData(savedData);
       }
-    } catch (e) {
-      // error reading value
-      alert(e);
+    } catch (error) {
+      alert(error.message);
     }
   };
 

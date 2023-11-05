@@ -11,7 +11,6 @@ import {
   AppState,
 } from "react-native";
 import { OPEN_WEATHER_API_KEY } from "@env";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { ThemeContext, UserContext } from "../context";
 import {
@@ -23,6 +22,7 @@ import {
   EditLocation,
   DisplayError,
 } from "../components";
+import getSavedWeatherData from "../utilities/GetSavedWeatherData";
 
 export default function Home({ navigation }) {
   const [themeColors] = useContext(ThemeContext);
@@ -285,10 +285,8 @@ export default function Home({ navigation }) {
   };
 
   const getOfflineWeatherData = async (errorText) => {
-    console.log(`Running getOfflineWeatherData`);
     try {
-      const jsonValue = await AsyncStorage.getItem("weather-data");
-      const savedData = jsonValue != null ? JSON.parse(jsonValue) : null;
+      const savedData = await getSavedWeatherData();
       if (savedData) {
         //Previously saved data is available
         const { today, forecast5Days } = savedData.currentLocationWeather;
@@ -317,8 +315,8 @@ export default function Home({ navigation }) {
       } else {
         setErrorMessage(errorText);
       }
-    } catch (e) {
-      setErrorMessage(e.message);
+    } catch (err) {
+      setErrorMessage(err.message);
     }
   };
 
