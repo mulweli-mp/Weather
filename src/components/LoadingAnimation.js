@@ -1,9 +1,18 @@
-import { StyleSheet, ActivityIndicator, View } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
+import LottieView from "lottie-react-native";
 
 export default function LoadingAnimation() {
   return (
     <View style={styles.container}>
-      <ActivityIndicator size={"large"} color={"green"} />
+      <LottieView
+        source={require("../../assets/lottie-files/loading.json")}
+        autoPlay
+        style={{
+          height: 200,
+          width: 200,
+        }}
+      />
+      <Text style={styles.messegeText}>Please wait...</Text>
     </View>
   );
 }
@@ -14,5 +23,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  messegeText: {
+    color: "grey",
   },
 });
