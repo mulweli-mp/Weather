@@ -28,7 +28,6 @@ const SCREEN_WIDTH = Dimensions.get("window").width;
 
 export default function EditLocation({
   fetchWeatherForecast,
-  locationModalVisible,
   setLocationModalVisible,
 }) {
   const [userWeatherData] = useContext(UserContext);
@@ -192,11 +191,7 @@ export default function EditLocation({
   };
 
   return (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={locationModalVisible}
-    >
+    <Modal animationType="slide" transparent={true} visible={true}>
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <TouchableOpacity
