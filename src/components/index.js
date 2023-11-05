@@ -5,6 +5,7 @@ import LoadingAnimation from "./LoadingAnimation";
 import LocationPermision from "./LocationPermision";
 import EditLocation from "./EditLocation";
 import CustomStatusBar from "./CustomStatusBar";
+import DisplayError from "./DisplayError";
 
 export {
   HomeHeader,
@@ -14,4 +15,5 @@ export {
   LocationPermision,
   EditLocation,
   CustomStatusBar,
+  DisplayError,
 };
