@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import {
   StyleSheet,
   View,
@@ -40,6 +40,8 @@ export default function EditLocation({
     []
   );
   const [mapModalVisible, setMapModalVisible] = useState(false);
+
+  const inputRef = useRef();
 
   useEffect(() => {
     getSavedLocationsCurrentWeather();
@@ -190,6 +192,14 @@ export default function EditLocation({
     );
   };
 
+  const focusInput = () => {
+    setMapModalVisible(false);
+    inputRef?.current?.blur(); //Making sure the keboard is visible
+    setTimeout(() => {
+      inputRef?.current?.focus();
+    }, 1000);
+  };
+
   return (
     <Modal animationType="slide" transparent={true} visible={true}>
       <View style={styles.container}>
@@ -209,6 +219,7 @@ export default function EditLocation({
             value={searchQuery}
             placeholder="Enter the name of city"
             placeholderTextColor={"grey"}
+            ref={inputRef}
           />
           <TouchableOpacity
             onPress={() => setMapModalVisible(true)}
@@ -273,7 +284,14 @@ export default function EditLocation({
             />
           </View>
         )}
-        <AddLocationMap mapModalVisible={mapModalVisible} />
+        {mapModalVisible && (
+          <AddLocationMap
+            setMapModalVisible={setMapModalVisible}
+            setLocationModalVisible={setLocationModalVisible}
+            fetchWeatherForecast={fetchWeatherForecast}
+            focusInput={focusInput}
+          />
+        )}
       </View>
     </Modal>
   );
