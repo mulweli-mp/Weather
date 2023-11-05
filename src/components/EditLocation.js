@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -13,11 +13,13 @@ import {
   Image,
 } from "react-native";
 import { Ionicons, Feather } from "@expo/vector-icons";
-import { MAPBOX_ACCESS_TOKEN } from "@env";
+
+import { MAPBOX_ACCESS_TOKEN, OPEN_WEATHER_API_KEY } from "@env";
 
 import { UserContext } from "../context";
 
 import weatherIcons from "../utilities/WeatherIcons";
+import getSavedWeatherData from "../utilities/GetSavedWeatherData";
 
 const DEVICE_HEIGHT = Dimensions.get("window").height;
 const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -29,8 +31,87 @@ export default function EditLocation({
   const [userWeatherData] = useContext(UserContext);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingSearchResults, setIsLoadingSearchResults] = useState(false);
+  const [isLoadingSavedLocations, setIsLoadingSavedLocations] = useState(true);
   const [searchResults, setSearchResults] = useState([]);
+  const [savedLocationsWeatherData, setSavedLocationsWeatherData] = useState(
+    []
+  );
+
+  useEffect(() => {
+    getSavedLocationsCurrentWeather();
+  }, []);
+
+  const getSavedLocationsCurrentWeather = async () => {
+    const savedWeatherData = await getSavedWeatherData();
+    if (savedWeatherData) {
+      savedLocations = savedWeatherData.savedLocationsWeather;
+      fetchWeatherForAllLocations(savedLocations)
+        .then((weatherDataArray) => {
+          setSavedLocationsWeatherData(weatherDataArray);
+          setIsLoadingSavedLocations(false);
+        })
+        .catch((error) => {
+          alert(error.message);
+          setIsLoadingSavedLocations(false);
+        });
+    }
+  };
+
+  const weatherCategories = {
+    Clear: "sunny",
+    Rain: "rainy",
+    Drizzle: "rainy",
+    Thunderstorm: "rainy",
+    Clouds: "cloudy",
+    Snow: "cloudy",
+    Mist: "cloudy",
+    Fog: "cloudy",
+  };
+
+  const fetchWeatherData = async (latitude, longitude) => {
+    const currentWeatherApiUrl =
+      "http://api.openweathermap.org/data/2.5/weather";
+    const response = await fetch(
+      `${currentWeatherApiUrl}?lat=${latitude}&lon=${longitude}&appid=${OPEN_WEATHER_API_KEY}&units=metric`
+    );
+
+    if (!response.ok) {
+      throw new Error("Weather data request failed.");
+    }
+
+    const data = await response.json();
+    const { main, weather } = data;
+    const { temp } = main;
+    const { main: weatherMain, description } = weather[0];
+
+    const general = weatherCategories[weatherMain] || "unknown";
+    const currentTemperature = Math.round(temp);
+
+    const weatherData = {
+      general,
+      description,
+      currentTemperature,
+    };
+    return weatherData;
+  };
+
+  // Function to fetch weather data for all locations and return a new array with weather data
+  const fetchWeatherForAllLocations = async (locations) => {
+    const weatherPromises = locations.map((location) =>
+      fetchWeatherData(location.latitude, location.longitude)
+    );
+
+    try {
+      const weatherData = await Promise.all(weatherPromises);
+      return weatherData.map((data, index) => ({
+        ...locations[index],
+        ...data,
+      }));
+    } catch (error) {
+      // Parent function wll catch the error
+    }
+  };
 
   const onChangeText = (text) => {
     setSearchQuery(text);
@@ -42,7 +123,7 @@ export default function EditLocation({
   };
 
   const searchPlaces = (query) => {
-    setIsLoading(true);
+    setIsLoadingSearchResults(true);
     const geocodingEndpoint = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
       query
     )}.json`;
@@ -52,48 +133,58 @@ export default function EditLocation({
       .then((response) => response.json())
       .then((data) => {
         setSearchResults(data.features);
-        setIsLoading(false);
+        setIsLoadingSearchResults(false);
       })
       .catch((error) => {
         console.error("Error in geocoding request:", error);
       });
   };
 
-  const RenderItem = ({ item }) => (
-    <TouchableOpacity style={styles.savedPlaceContainer}>
-      <View style={styles.aboutLocation}>
-        <Text numberOfLines={2} style={styles.tempText}>
-          {item.placeName}
-        </Text>
-      </View>
-      <View style={styles.locationsWeather}>
-        <View style={styles.tempContainer}>
-          <Image
-            style={styles.weatherImage}
-            source={weatherIcons[item.general]}
-          />
-          <Text style={styles.tempText}>{item.currentTemperature}°C</Text>
-        </View>
-        <Text numberOfLines={2} style={styles.descriptionText}>
-          {item.description}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
-
   const onTapLocation = (data) => {
-    const latitude = data.center[1];
-    const longitude = data.center[0];
-    const searchQueryPlaceName = data.text;
+    const { latitude, longitude, placeName } = data;
 
     fetchWeatherForecast({
       latitude,
       longitude,
-      fetchOrigion: "searchLocation",
-      placeName: searchQueryPlaceName,
-      siletRefresh: false,
+      placeName,
+      silentRefresh: false,
     });
     setLocationModalVisible(false);
+  };
+
+  const RenderItem = ({ item, isFirstItem }) => {
+    let currentlyDisplayedLocation =
+      !isFirstItem &&
+      userWeatherData.currentLocationWeather.today.placeName === item.placeName;
+
+    if (currentlyDisplayedLocation) {
+      //Remove duplicate location that is already in ListHeaderComponent
+      return null;
+    }
+    return (
+      <TouchableOpacity
+        onPress={() => onTapLocation(item)}
+        style={styles.savedPlaceContainer}
+      >
+        <View style={styles.aboutLocation}>
+          <Text numberOfLines={2} style={styles.tempText}>
+            {item.placeName}
+          </Text>
+        </View>
+        <View style={styles.locationsWeather}>
+          <View style={styles.tempContainer}>
+            <Image
+              style={styles.weatherImage}
+              source={weatherIcons[item.general]}
+            />
+            <Text style={styles.tempText}>{item.currentTemperature}°C</Text>
+          </View>
+          <Text numberOfLines={2} style={styles.descriptionText}>
+            {item.description}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    );
   };
 
   return (
@@ -119,7 +210,7 @@ export default function EditLocation({
           //   onPress={() => setLocationModalVisible(false)}
           style={styles.mapButton}
         >
-          {isLoading ? (
+          {isLoadingSearchResults ? (
             <ActivityIndicator size={"small"} color={"white"} />
           ) : (
             <Feather name="map" size={20} color="white" />
@@ -138,7 +229,12 @@ export default function EditLocation({
               keyboardShouldPersistTaps="always"
             >
               <TouchableOpacity
-                onPress={() => onTapLocation(location)}
+                onPress={() => {
+                  const latitude = location.center[1];
+                  const longitude = location.center[0];
+                  const placeName = location.text;
+                  onTapLocation({ latitude, longitude, placeName });
+                }}
                 style={styles.placeButton}
               >
                 <Text style={styles.locationText} numberOfLines={1}>
@@ -148,13 +244,22 @@ export default function EditLocation({
             </ScrollView>
           ))}
         </View>
+      ) : isLoadingSavedLocations ? (
+        <ActivityIndicator
+          size={"large"}
+          color={"grey"}
+          style={{ marginTop: 100 }}
+        />
       ) : (
         <View style={styles.savedPlacesContainer}>
           <FlatList
-            data={userWeatherData.savedLocationsWeather}
+            data={savedLocationsWeatherData}
             ListHeaderComponent={() =>
               userWeatherData.currentLocationWeather && (
-                <RenderItem item={userWeatherData.currentLocationWeather} />
+                <RenderItem
+                  item={userWeatherData.currentLocationWeather.today}
+                  isFirstItem={true}
+                />
               )
             }
             renderItem={({ item }) => <RenderItem item={item} />}
