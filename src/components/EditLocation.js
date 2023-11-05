@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
+  Modal,
 } from "react-native";
 import { Ionicons, Feather } from "@expo/vector-icons";
 
@@ -20,12 +21,14 @@ import { UserContext } from "../context";
 
 import weatherIcons from "../utilities/WeatherIcons";
 import getSavedWeatherData from "../utilities/GetSavedWeatherData";
+import AddLocationMap from "./AddLocationMap";
 
 const DEVICE_HEIGHT = Dimensions.get("window").height;
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
 export default function EditLocation({
   fetchWeatherForecast,
+  locationModalVisible,
   setLocationModalVisible,
 }) {
   const [userWeatherData] = useContext(UserContext);
@@ -37,6 +40,7 @@ export default function EditLocation({
   const [savedLocationsWeatherData, setSavedLocationsWeatherData] = useState(
     []
   );
+  const [mapModalVisible, setMapModalVisible] = useState(false);
 
   useEffect(() => {
     getSavedLocationsCurrentWeather();
@@ -188,88 +192,95 @@ export default function EditLocation({
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <TouchableOpacity
-          onPress={() => setLocationModalVisible(false)}
-          style={styles.closeButton}
-        >
-          <Ionicons name="close" size={28} color="white" />
-        </TouchableOpacity>
-        <Text style={styles.closeButtonText}>Edit Locations</Text>
-      </View>
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.inputStyle}
-          onChangeText={onChangeText}
-          value={searchQuery}
-          placeholder="Enter the name of city"
-          placeholderTextColor={"grey"}
-        />
-        <TouchableOpacity
-          //   onPress={() => setLocationModalVisible(false)}
-          style={styles.mapButton}
-        >
-          {isLoadingSearchResults ? (
-            <ActivityIndicator size={"small"} color={"white"} />
-          ) : (
-            <Feather name="map" size={20} color="white" />
-          )}
-        </TouchableOpacity>
-      </View>
-
-      {searchQuery.length > 0 ? (
-        <View style={styles.searchResultsContainer}>
-          {searchResults.map((location) => (
-            <ScrollView
-              key={location.place_name}
-              style={styles.placeContainer}
-              showsHorizontalScrollIndicator={false}
-              horizontal
-              keyboardShouldPersistTaps="always"
-            >
-              <TouchableOpacity
-                onPress={() => {
-                  const latitude = location.center[1];
-                  const longitude = location.center[0];
-                  const placeName = location.text;
-                  onTapLocation({ latitude, longitude, placeName });
-                }}
-                style={styles.placeButton}
-              >
-                <Text style={styles.locationText} numberOfLines={1}>
-                  {location.place_name}
-                </Text>
-              </TouchableOpacity>
-            </ScrollView>
-          ))}
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={locationModalVisible}
+    >
+      <View style={styles.container}>
+        <View style={styles.headerContainer}>
+          <TouchableOpacity
+            onPress={() => setLocationModalVisible(false)}
+            style={styles.closeButton}
+          >
+            <Ionicons name="close" size={28} color="white" />
+          </TouchableOpacity>
+          <Text style={styles.closeButtonText}>Edit Locations</Text>
         </View>
-      ) : isLoadingSavedLocations ? (
-        <ActivityIndicator
-          size={"large"}
-          color={"grey"}
-          style={{ marginTop: 100 }}
-        />
-      ) : (
-        <View style={styles.savedPlacesContainer}>
-          <FlatList
-            data={savedLocationsWeatherData}
-            ListHeaderComponent={() =>
-              userWeatherData.currentLocationWeather && (
-                <RenderItem
-                  item={userWeatherData.currentLocationWeather.today}
-                  isFirstItem={true}
-                />
-              )
-            }
-            renderItem={({ item }) => <RenderItem item={item} />}
-            keyExtractor={(item, index) => item.placeName + index}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="always"
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.inputStyle}
+            onChangeText={onChangeText}
+            value={searchQuery}
+            placeholder="Enter the name of city"
+            placeholderTextColor={"grey"}
           />
+          <TouchableOpacity
+            onPress={() => setMapModalVisible(true)}
+            style={styles.mapButton}
+          >
+            {isLoadingSearchResults ? (
+              <ActivityIndicator size={"small"} color={"white"} />
+            ) : (
+              <Feather name="map" size={20} color="white" />
+            )}
+          </TouchableOpacity>
         </View>
-      )}
-    </View>
+
+        {searchQuery.length > 0 ? (
+          <View style={styles.searchResultsContainer}>
+            {searchResults.map((location) => (
+              <ScrollView
+                key={location.place_name}
+                style={styles.placeContainer}
+                showsHorizontalScrollIndicator={false}
+                horizontal
+                keyboardShouldPersistTaps="always"
+              >
+                <TouchableOpacity
+                  onPress={() => {
+                    const latitude = location.center[1];
+                    const longitude = location.center[0];
+                    const placeName = location.text;
+                    onTapLocation({ latitude, longitude, placeName });
+                  }}
+                  style={styles.placeButton}
+                >
+                  <Text style={styles.locationText} numberOfLines={1}>
+                    {location.place_name}
+                  </Text>
+                </TouchableOpacity>
+              </ScrollView>
+            ))}
+          </View>
+        ) : isLoadingSavedLocations ? (
+          <ActivityIndicator
+            size={"large"}
+            color={"grey"}
+            style={{ marginTop: 100 }}
+          />
+        ) : (
+          <View style={styles.savedPlacesContainer}>
+            <FlatList
+              data={savedLocationsWeatherData}
+              ListHeaderComponent={() =>
+                userWeatherData.currentLocationWeather && (
+                  <RenderItem
+                    item={userWeatherData.currentLocationWeather.today}
+                    isFirstItem={true}
+                  />
+                )
+              }
+              renderItem={({ item }) => <RenderItem item={item} />}
+              keyExtractor={(item, index) => item.placeName + index}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="always"
+            />
+          </View>
+        )}
+        <AddLocationMap mapModalVisible={mapModalVisible} />
+      </View>
+    </Modal>
   );
 }
 

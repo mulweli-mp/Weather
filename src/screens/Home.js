@@ -418,16 +418,11 @@ export default function Home({ navigation }) {
         <ForecastWeather forecastArray={forecastArray} />
       </View>
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={locationModalVisible}
-      >
-        <EditLocation
-          fetchWeatherForecast={fetchWeatherForecast}
-          setLocationModalVisible={setLocationModalVisible}
-        />
-      </Modal>
+      <EditLocation
+        fetchWeatherForecast={fetchWeatherForecast}
+        locationModalVisible={locationModalVisible}
+        setLocationModalVisible={setLocationModalVisible}
+      />
     </View>
   );
 }
