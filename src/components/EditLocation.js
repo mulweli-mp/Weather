@@ -72,7 +72,7 @@ export default function EditLocation({
             style={styles.weatherImage}
             source={weatherIcons[item.general]}
           />
-          <Text style={styles.tempText}>{item.currentTemp}°C</Text>
+          <Text style={styles.tempText}>{item.currentTemperature}°C</Text>
         </View>
         <Text numberOfLines={2} style={styles.descriptionText}>
           {item.description}

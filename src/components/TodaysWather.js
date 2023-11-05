@@ -1,14 +1,12 @@
 import { StyleSheet, Text, View } from "react-native";
 
-export default function TodaysWather({
-  minTemperature,
-  currentTemperature,
-  maxTemperature,
-}) {
+export default function TodaysWather({ currentWeather }) {
   return (
     <View style={styles.container}>
       <View style={styles.reportBox}>
-        <Text style={styles.subTempText}>{minTemperature}°C</Text>
+        <Text style={styles.subTempText}>
+          {currentWeather.minTemperature}°C
+        </Text>
         <Text style={styles.labelText}>min</Text>
       </View>
       <View
@@ -19,7 +17,9 @@ export default function TodaysWather({
           },
         ]}
       >
-        <Text style={styles.subTempText}>{currentTemperature}°C</Text>
+        <Text style={styles.subTempText}>
+          {currentWeather.currentTemperature}°C
+        </Text>
         <Text style={styles.labelText}>Current</Text>
       </View>
       <View
@@ -30,7 +30,9 @@ export default function TodaysWather({
           },
         ]}
       >
-        <Text style={styles.subTempText}>{maxTemperature}°C</Text>
+        <Text style={styles.subTempText}>
+          {currentWeather.maxTemperature}°C
+        </Text>
         <Text style={styles.labelText}>max</Text>
       </View>
     </View>
