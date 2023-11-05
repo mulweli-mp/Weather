@@ -67,9 +67,8 @@ export default function LocationPermision({ fetchWeatherForecast }) {
     fetchWeatherForecast({
       latitude,
       longitude,
-      fetchOrigion: "currentLocation",
       placeName: null,
-      siletRefresh: false,
+      silentRefresh: false,
     });
   };
 

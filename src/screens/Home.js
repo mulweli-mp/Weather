@@ -73,7 +73,7 @@ export default function Home({ navigation }) {
             latitude: currentWeather.latitude,
             longitude: currentWeather.longitude,
             placeName: currentWeather.placeName,
-            siletRefresh: true,
+            silentRefresh: true,
           });
         }
       }
@@ -234,11 +234,11 @@ export default function Home({ navigation }) {
 
     const forecastApiUrl = "http://api.openweathermap.org/data/2.5/forecast";
 
-    const { latitude, longitude, placeName, siletRefresh } = data;
+    const { latitude, longitude, placeName, silentRefresh } = data;
 
     try {
-      if (!siletRefresh) {
-        //siletRefresh is important to keep the offline mode persistent
+      if (!silentRefresh) {
+        //silentRefresh is important to keep the offline mode persistent
         //If the weather information is outdated, we need to have the ability to refresh it without clearing data on screen
         setIsLoadingCurrent(true);
         setIsLoadingForecast(true);
@@ -407,7 +407,7 @@ export default function Home({ navigation }) {
                 latitude: currentWeather.latitude,
                 longitude: currentWeather.longitude,
                 placeName: currentWeather.placeName,
-                siletRefresh: false,
+                silentRefresh: false,
               });
             }}
           >
