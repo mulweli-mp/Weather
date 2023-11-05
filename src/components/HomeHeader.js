@@ -1,17 +1,12 @@
-import { useContext } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import CustomStatusBar from "./CustomStatusBar";
 
-import { ThemeContext } from "../context/ThemeContext";
-
 export default function HomeHeader({
   openDrawer,
-  locationName,
+  placeName,
   setLocationModalVisible,
 }) {
-  const [themeColors] = useContext(ThemeContext);
-
   return (
     <View style={styles.container}>
       <CustomStatusBar />
@@ -24,7 +19,7 @@ export default function HomeHeader({
           style={styles.locationButton}
         >
           <Text numberOfLines={2} style={styles.locationText}>
-            {locationName}
+            {placeName}
           </Text>
           <Ionicons name="ios-chevron-down" size={20} color="white" />
         </TouchableOpacity>
