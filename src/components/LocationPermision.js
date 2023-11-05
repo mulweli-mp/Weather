@@ -98,7 +98,7 @@ export default function LocationPermision({ fetchWeatherForecast }) {
         }}
       />
 
-      <Text style={styles.tittleText}>LOCATION PERMISSIONs</Text>
+      <Text style={styles.tittleText}>LOCATION PERMISSION</Text>
 
       <Text style={styles.messageText}>
         We need access to your device location so that we can show you weather
