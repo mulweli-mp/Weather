@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Alert,
   Vibration,
+  AppState,
 } from "react-native";
 import { OPEN_WEATHER_API_KEY } from "@env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -36,16 +37,48 @@ export default function Home({ navigation }) {
   const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
+    const subscription = AppState.addEventListener(
+      "change",
+      _handleAppStateChange
+    );
+
     syncUpdateTime();
     const intervalId = setInterval(() => {
       syncUpdateTime();
     }, 30000);
 
-    // Clear the interval when the component unmounts
+    // Clear subscription and interval
     return () => {
       clearInterval(intervalId);
+      subscription.remove();
     };
   }, [currentWeather]);
+
+  const _handleAppStateChange = (nextAppState) => {
+    if (nextAppState === "active") {
+      //App came to the foreground
+      if (currentWeather) {
+        const minutesDifference = calculateMinutesDifference(
+          currentWeather?.timeUpdated,
+          new Date()
+        );
+
+        if (minutesDifference > 60) {
+          //Reason for this refresh is:
+          //A user may keep the app in the background for hours
+          //After which if they foreground the app, it will still display outdated weather information
+          //And it will be a bad user experience to let the user figure it out on their own that they have to...
+          //Press REFRESH or Reload the app to get the latest weather information
+          fetchWeatherForecast({
+            latitude: currentWeather.latitude,
+            longitude: currentWeather.longitude,
+            placeName: currentWeather.placeName,
+            siletRefresh: true,
+          });
+        }
+      }
+    }
+  };
 
   const syncUpdateTime = () => {
     if (currentWeather) {
@@ -91,15 +124,8 @@ export default function Home({ navigation }) {
   };
 
   const processCurrentWeatherData = (data) => {
-    const {
-      main,
-      weather,
-      name,
-      latitude,
-      longitude,
-      fetchOrigion,
-      searchQueryPlaceName,
-    } = data;
+    const { main, weather, name, latitude, longitude, searchQueryPlaceName } =
+      data;
     const { temp, temp_min, temp_max } = main;
     const { main: weatherMain, description } = weather[0];
 
@@ -120,7 +146,6 @@ export default function Home({ navigation }) {
       currentTemperature,
       latitude,
       longitude,
-      fetchOrigion,
       timeUpdated,
       minTemperature,
       maxTemperature,
@@ -201,12 +226,7 @@ export default function Home({ navigation }) {
     setIsLoadingForecast(false);
   };
 
-  const fetchWeatherForecast = async (
-    latitude,
-    longitude,
-    fetchOrigion,
-    searchQueryPlaceName
-  ) => {
+  const fetchWeatherForecast = async (data) => {
     console.log(`Running fetchWeatherForecast`);
 
     const currentWeatherApiUrl =
@@ -214,9 +234,16 @@ export default function Home({ navigation }) {
 
     const forecastApiUrl = "http://api.openweathermap.org/data/2.5/forecast";
 
+    const { latitude, longitude, placeName, siletRefresh } = data;
+
     try {
-      setIsLoadingCurrent(true);
-      setIsLoadingForecast(true);
+      if (!siletRefresh) {
+        //siletRefresh is important to keep the offline mode persistent
+        //If the weather information is outdated, we need to have the ability to refresh it without clearing data on screen
+        setIsLoadingCurrent(true);
+        setIsLoadingForecast(true);
+      }
+
       setIsFetchingLocation(false);
 
       //Fetch data for current weather
@@ -235,8 +262,7 @@ export default function Home({ navigation }) {
         ...currentWeatherData,
         latitude,
         longitude,
-        fetchOrigion,
-        searchQueryPlaceName,
+        searchQueryPlaceName: placeName,
       });
 
       //Fetch data for future weather forecast
@@ -377,12 +403,12 @@ export default function Home({ navigation }) {
           <TouchableOpacity
             style={styles.refreshButton}
             onPress={() => {
-              fetchWeatherForecast(
-                currentWeather.latitude,
-                currentWeather.longitude,
-                currentWeather.fetchOrigion,
-                currentWeather.placeName
-              );
+              fetchWeatherForecast({
+                latitude: currentWeather.latitude,
+                longitude: currentWeather.longitude,
+                placeName: currentWeather.placeName,
+                siletRefresh: false,
+              });
             }}
           >
             <Text style={styles.refreshText}>REFRESH</Text>
