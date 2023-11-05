@@ -22,7 +22,8 @@ import {
   DisplayError,
 } from "../components";
 import getSavedWeatherData from "../utilities/GetSavedWeatherData";
-import weatherCategories from "../utilities/WeatherIcons";
+import weatherCategories from "../utilities/WeatherCategories";
+import weatherImages from "../utilities/WeatherImages";
 
 export default function Home({ navigation }) {
   const [themeColors] = useContext(ThemeContext);
@@ -227,8 +228,6 @@ export default function Home({ navigation }) {
   };
 
   const fetchWeatherForecast = async (data) => {
-    console.log(`Running fetchWeatherForecast`);
-
     const currentWeatherApiUrl =
       "http://api.openweathermap.org/data/2.5/weather";
 
@@ -318,19 +317,6 @@ export default function Home({ navigation }) {
     } catch (err) {
       setErrorMessage(err.message);
     }
-  };
-
-  const weatherImages = {
-    sea: {
-      rainy: require("../../assets/Images/sea/rainy.png"),
-      sunny: require("../../assets/Images/sea/sunny.png"),
-      cloudy: require("../../assets/Images/sea/cloudy.png"),
-    },
-    forest: {
-      rainy: require("../../assets/Images/forest/rainy.png"),
-      sunny: require("../../assets/Images/forest/sunny.png"),
-      cloudy: require("../../assets/Images/forest/cloudy.png"),
-    },
   };
 
   if (errorMessage) {
