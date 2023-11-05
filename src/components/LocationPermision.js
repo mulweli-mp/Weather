@@ -64,7 +64,13 @@ export default function LocationPermision({ fetchWeatherForecast }) {
     });
 
     const { latitude, longitude } = location.coords;
-    fetchWeatherForecast(latitude, longitude, "currentLocation");
+    fetchWeatherForecast({
+      latitude,
+      longitude,
+      fetchOrigion: "currentLocation",
+      placeName: null,
+      siletRefresh: false,
+    });
   };
 
   const requestForegroundLocation = async () => {

@@ -86,12 +86,13 @@ export default function EditLocation({
     const longitude = data.center[0];
     const searchQueryPlaceName = data.text;
 
-    fetchWeatherForecast(
+    fetchWeatherForecast({
       latitude,
       longitude,
-      "searchLocation",
-      searchQueryPlaceName
-    );
+      fetchOrigion: "searchLocation",
+      placeName: searchQueryPlaceName,
+      siletRefresh: false,
+    });
     setLocationModalVisible(false);
   };
 
