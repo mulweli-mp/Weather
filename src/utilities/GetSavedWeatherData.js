@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const getSavedWeatherData = async () => {
+export default getSavedWeatherData = async () => {
   try {
     const jsonValue = await AsyncStorage.getItem("weather-data");
     return jsonValue != null ? JSON.parse(jsonValue) : null;
@@ -9,5 +9,3 @@ const getSavedWeatherData = async () => {
     alert(e);
   }
 };
-
-export default getSavedWeatherData;
