@@ -418,11 +418,12 @@ export default function Home({ navigation }) {
         <ForecastWeather forecastArray={forecastArray} />
       </View>
 
-      <EditLocation
-        fetchWeatherForecast={fetchWeatherForecast}
-        locationModalVisible={locationModalVisible}
-        setLocationModalVisible={setLocationModalVisible}
-      />
+      {locationModalVisible && (
+        <EditLocation
+          fetchWeatherForecast={fetchWeatherForecast}
+          setLocationModalVisible={setLocationModalVisible}
+        />
+      )}
     </View>
   );
 }
