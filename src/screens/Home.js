@@ -4,7 +4,6 @@ import {
   Text,
   View,
   ImageBackground,
-  Modal,
   TouchableOpacity,
   Alert,
   Vibration,
@@ -23,6 +22,7 @@ import {
   DisplayError,
 } from "../components";
 import getSavedWeatherData from "../utilities/GetSavedWeatherData";
+import weatherCategories from "../utilities/WeatherIcons";
 
 export default function Home({ navigation }) {
   const [themeColors] = useContext(ThemeContext);
@@ -318,17 +318,6 @@ export default function Home({ navigation }) {
     } catch (err) {
       setErrorMessage(err.message);
     }
-  };
-
-  const weatherCategories = {
-    Clear: "sunny",
-    Rain: "rainy",
-    Drizzle: "rainy",
-    Thunderstorm: "rainy",
-    Clouds: "cloudy",
-    Snow: "cloudy",
-    Mist: "cloudy",
-    Fog: "cloudy",
   };
 
   const weatherImages = {

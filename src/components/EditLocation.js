@@ -20,6 +20,7 @@ import { MAPBOX_ACCESS_TOKEN, OPEN_WEATHER_API_KEY } from "@env";
 import { UserContext } from "../context";
 
 import weatherIcons from "../utilities/WeatherIcons";
+import weatherCategories from "../utilities/WeatherIcons";
 import getSavedWeatherData from "../utilities/GetSavedWeatherData";
 import AddLocationMap from "./AddLocationMap";
 
@@ -61,17 +62,6 @@ export default function EditLocation({
           setIsLoadingSavedLocations(false);
         });
     }
-  };
-
-  const weatherCategories = {
-    Clear: "sunny",
-    Rain: "rainy",
-    Drizzle: "rainy",
-    Thunderstorm: "rainy",
-    Clouds: "cloudy",
-    Snow: "cloudy",
-    Mist: "cloudy",
-    Fog: "cloudy",
   };
 
   const fetchWeatherData = async (latitude, longitude) => {
