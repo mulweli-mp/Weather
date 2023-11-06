@@ -65,6 +65,8 @@ export default function EditLocation({
           alert(error.message);
           setIsLoadingSavedLocations(false);
         });
+    } else {
+      setIsLoadingSavedLocations(false);
     }
   };
 
@@ -305,7 +307,8 @@ export default function EditLocation({
             <FlatList
               data={savedLocationsWeatherData}
               ListHeaderComponent={() =>
-                userWeatherData.currentLocationWeather && (
+                userWeatherData.currentLocationWeather.today
+                  .currentTemperature && (
                   <RenderItem
                     item={userWeatherData.currentLocationWeather.today}
                     isFirstItem={true}
