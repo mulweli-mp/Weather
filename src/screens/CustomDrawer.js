@@ -29,12 +29,7 @@ export default function CustomDrawer({ navigation }) {
       navigationScreen: "Settings",
       iconName: "settings-outline",
     },
-    {
-      optionName: "Add New Location",
-      key: "add-new-location",
-      navigationScreen: "AddNewLocation",
-      iconName: "locate",
-    },
+
     {
       optionName: "Saved Locations",
       key: "saved-locations",
@@ -46,7 +41,7 @@ export default function CustomDrawer({ navigation }) {
   return (
     <View style={styles.container}>
       {currentWeather.currentTemperature && (
-        //App crashes if this is false
+        //App crashes if this is false because of toUpperCase() below
         <ImageBackground
           style={styles.currentWeatherContainer}
           source={weatherImages[themeColors.theme][currentWeather.general]}
