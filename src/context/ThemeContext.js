@@ -1,4 +1,5 @@
-import { useState, createContext } from "react";
+import { useState, createContext, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const ThemeContext = createContext();
 
@@ -10,11 +11,41 @@ export const ThemeProvider = (props) => {
     rainy: "#57575d",
   });
 
+  useEffect(() => {
+    getSavedTheme();
+  }, []);
+
+  const saveSelectedTheme = async (theme) => {
+    try {
+      const jsonValue = JSON.stringify(theme);
+      await AsyncStorage.setItem("theme", jsonValue);
+    } catch (e) {
+      // saving error
+    }
+  };
+
+  const getSavedTheme = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem("theme");
+      let theme = jsonValue != null ? JSON.parse(jsonValue) : null;
+      if (theme) {
+        setThemeColors((prevState) => ({
+          ...prevState,
+          theme,
+        }));
+      }
+    } catch (e) {
+      // error reading value
+      alert(e);
+    }
+  };
+
   const changeTheme = (theme) => {
     setThemeColors((prevState) => ({
       ...prevState,
       theme,
     }));
+    saveSelectedTheme(theme);
   };
 
   return (
