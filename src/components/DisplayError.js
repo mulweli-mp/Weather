@@ -19,11 +19,7 @@ export default function DisplayError({ errorMessage, tryAgain }) {
         }}
       />
 
-      <Text style={styles.errorText}>
-        {errorMessage == "Network request failed"
-          ? "Failed to connect to the internet! Please check your network and try again"
-          : errorMessage}
-      </Text>
+      <Text style={styles.errorText}>{errorMessage}</Text>
 
       <TouchableOpacity style={styles.reloadButton} onPress={tryAgain}>
         <Text style={styles.reloadText}>TRY AGAIN</Text>
