@@ -230,9 +230,9 @@ export default function Home({ navigation }) {
 
   const fetchWeatherForecast = async (data) => {
     const currentWeatherApiUrl =
-      "http://api.openweathermap.org/data/2.5/weather";
+      "https://api.openweathermap.org/data/2.5/weather";
 
-    const forecastApiUrl = "http://api.openweathermap.org/data/2.5/forecast";
+    const forecastApiUrl = "https://api.openweathermap.org/data/2.5/forecast";
 
     const { latitude, longitude, placeName, silentRefresh } = data;
 

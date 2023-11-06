@@ -72,7 +72,7 @@ export default function EditLocation({
 
   const fetchWeatherData = async (latitude, longitude) => {
     const currentWeatherApiUrl =
-      "http://api.openweathermap.org/data/2.5/weather";
+      "https://api.openweathermap.org/data/2.5/weather";
     const response = await fetch(
       `${currentWeatherApiUrl}?lat=${latitude}&lon=${longitude}&appid=${OPEN_WEATHER_API_KEY}&units=metric`
     );
