@@ -69,8 +69,20 @@ export const UserProvider = (props) => {
     }
   };
 
+  const deleteSavedLocation = (newPlaces) => {
+    let currentData = userWeatherData;
+    let newWeatherData = {
+      currentLocationWeather: currentData.currentLocationWeather,
+      savedLocationsWeather: newPlaces,
+    };
+    setUserWeatherData(newWeatherData);
+    storeOfflineWeatherData(newWeatherData);
+  };
+
   return (
-    <UserContext.Provider value={[userWeatherData, updateUserWeatherData]}>
+    <UserContext.Provider
+      value={[userWeatherData, updateUserWeatherData, deleteSavedLocation]}
+    >
       {props.children}
     </UserContext.Provider>
   );

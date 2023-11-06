@@ -12,6 +12,8 @@ import {
   FlatList,
   Image,
   Modal,
+  Alert,
+  Vibration,
 } from "react-native";
 import { Ionicons, Feather } from "@expo/vector-icons";
 
@@ -31,7 +33,8 @@ export default function EditLocation({
   fetchWeatherForecast,
   setLocationModalVisible,
 }) {
-  const [userWeatherData] = useContext(UserContext);
+  const [userWeatherData, updateUserWeatherData, deleteSavedLocation] =
+    useContext(UserContext);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoadingSearchResults, setIsLoadingSearchResults] = useState(false);
@@ -146,6 +149,86 @@ export default function EditLocation({
     setLocationModalVisible(false);
   };
 
+  const focusInput = () => {
+    setMapModalVisible(false);
+    inputRef?.current?.blur(); //Making sure the keboard is visible
+    setTimeout(() => {
+      inputRef?.current?.focus();
+    }, 1000);
+  };
+
+  const showDeleteAlert = (placeName, isFirstItem) => {
+    Vibration.vibrate();
+    if (isFirstItem) {
+      alert(
+        "You can not delete currently displayed location, please select another location as primary first in order to delete this one"
+      );
+
+      return;
+    }
+    Alert.alert(
+      `Delete ${placeName}?`,
+      "Confirm if you want to delete this place from your list",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "default",
+          onPress: () => deletePlace(placeName),
+        },
+      ]
+    );
+    Vibration.vibrate();
+  };
+
+  const deletePlace = (placeName) => {
+    let currentPlaces = savedLocationsWeatherData;
+    currentPlaces = currentPlaces.filter(
+      (item) => item["placeName"] !== placeName
+    );
+    deleteSavedLocation(currentPlaces);
+    setSavedLocationsWeatherData(currentPlaces);
+  };
+
+  const data = {
+    currentLocationWeather: {
+      forecast5Days: [[Object], [Object], [Object], [Object], [Object]],
+      today: {
+        currentTemperature: 19,
+        description: "scattered clouds",
+        general: "cloudy",
+        latitude: -25.7511904417539,
+        longitude: 28.20508885346138,
+        main: "Clouds",
+        maxTemperature: 20,
+        minTemperature: 18,
+        placeName: "Arcadia",
+        timeUpdated: "2023-11-06T02:29:25.911Z",
+      },
+    },
+    savedLocationsWeather: [
+      {
+        currentTemperature: 19,
+        description: "scattered clouds",
+        general: "unknown",
+        latitude: -25.7511904417539,
+        longitude: 28.20508885346138,
+        placeName: "Arcadia",
+      },
+      {
+        currentTemperature: 19,
+        description: "clear sky",
+        general: "unknown",
+        latitude: -28.741382581666112,
+        longitude: 24.76215845169456,
+        placeName: "Kimberley",
+      },
+    ],
+  };
+
   const RenderItem = ({ item, isFirstItem }) => {
     let currentlyDisplayedLocation =
       !isFirstItem &&
@@ -158,6 +241,7 @@ export default function EditLocation({
     return (
       <TouchableOpacity
         onPress={() => onTapLocation(item)}
+        onLongPress={() => showDeleteAlert(item.placeName, isFirstItem)}
         style={styles.savedPlaceContainer}
       >
         <View style={styles.aboutLocation}>
@@ -179,14 +263,6 @@ export default function EditLocation({
         </View>
       </TouchableOpacity>
     );
-  };
-
-  const focusInput = () => {
-    setMapModalVisible(false);
-    inputRef?.current?.blur(); //Making sure the keboard is visible
-    setTimeout(() => {
-      inputRef?.current?.focus();
-    }, 1000);
   };
 
   return (
