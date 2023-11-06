@@ -229,6 +229,7 @@ export default function Home({ navigation }) {
   };
 
   const fetchWeatherForecast = async (data) => {
+    console.log(`OPEN_WEATHER_API_KEY:`, OPEN_WEATHER_API_KEY);
     const currentWeatherApiUrl =
       "https://api.openweathermap.org/data/2.5/weather";
 
@@ -259,6 +260,7 @@ export default function Home({ navigation }) {
       }
 
       const currentWeatherData = await currentWeatherResponse.json();
+      // console.log(`currentWeatherData:`, currentWeatherData);
       processCurrentWeatherData({
         ...currentWeatherData,
         latitude,
@@ -280,6 +282,7 @@ export default function Home({ navigation }) {
 
       const forecastWeatherData = await forecastWeatherResponse.json();
       processFiveDayWeatherForecast(forecastWeatherData);
+      // console.log(`forecastWeatherData:`, forecastWeatherData);
     } catch (error) {
       getOfflineWeatherData(error.message);
     }

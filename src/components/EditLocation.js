@@ -123,6 +123,7 @@ export default function EditLocation({
   };
 
   const searchPlaces = (query) => {
+    console.log(`MAPBOX_ACCESS_TOKEN:`, MAPBOX_ACCESS_TOKEN);
     setIsLoadingSearchResults(true);
     const geocodingEndpoint = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
       query
