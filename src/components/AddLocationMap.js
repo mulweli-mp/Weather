@@ -1,5 +1,4 @@
 import { useRef, useState, useEffect } from "react";
-import MapView from "react-native-maps";
 import {
   StyleSheet,
   View,
@@ -13,6 +12,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
+import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 
 const DEVICE_HEIGHT = Dimensions.get("window").height;
 
@@ -166,6 +166,7 @@ export default function AddLocationMap({
             </View>
 
             <MapView
+              provider={PROVIDER_GOOGLE}
               ref={mapViewRef}
               onRegionChangeComplete={onRegionChangeComplete}
               style={styles.map}
