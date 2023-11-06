@@ -4,27 +4,31 @@
     "slug": "Weather",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/Images/icon-transparent.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/Images/icon-transparent.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#303030"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "foregroundImage": "./assets/Images/icon-transparent.png",
+        "backgroundColor": "#0f56b0"
+      },
+      "package": "com.MTech.Weather"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/Images/icon-transparent.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c35144c8-f5e0-4d33-a48d-f46eb69e8b2c"
+      }
     }
   }
 }
