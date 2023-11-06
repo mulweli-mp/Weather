@@ -9,6 +9,21 @@ Weather App is a mobile application built with React Native Expo that provides u
 - Two visually pleasing themes to choose from: "Forest" and "Sea."
 - Offline persistence, ensuring users can access the most recently updated weather information even without an internet connection.
 
+  
+## Screenshots
+ <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    <img src="https://github.com/GeneCodeFx/Weather/assets/52564475/84b462fd-8816-4d40-9549-64a9afb653a3" alt="Screenshot 3" width="135" height="300" style="border: 1px solid #ddd;">
+    <img src="https://github.com/GeneCodeFx/Weather/assets/52564475/228fab00-bbe2-41ae-8651-b5d61cea2577" alt="Screenshot 3" width="135" height="300" style="border: 1px solid #ddd;">
+    <img src="https://github.com/GeneCodeFx/Weather/assets/52564475/09bca3f5-fbba-4645-828c-c6bf50f63840" alt="Screenshot 3" width="135" height="300" style="border: 1px solid #ddd;">
+     <img src="https://github.com/GeneCodeFx/Weather/assets/52564475/17394240-a2fe-47cf-9f02-345dc2ca92a5" alt="Screenshot 3" width="135" height="300" style="border: 1px solid #ddd;">
+    <img src="https://github.com/GeneCodeFx/Weather/assets/52564475/7d68625e-ea15-4dde-acf9-589a30623f14" alt="Screenshot 1" width="135" height="300" style="border: 1px solid #ddd;">
+    <img src="https://github.com/GeneCodeFx/Weather/assets/52564475/a1cc45b7-acd8-4efc-bbae-5c343e6b96f5" alt="Screenshot 3" width="135" height="300" style="border: 1px solid #ddd;">
+    <img src="https://github.com/GeneCodeFx/Weather/assets/52564475/71183a4b-4b1b-4e0b-b2f1-5f78b2fc3c05" alt="Screenshot 2" width="135" height="300" style="border: 1px solid #ddd;">
+</div>
+
+## Try the app yourself
+[Download the Weather APK file here](https://drive.google.com/file/d/1LxrgIgzlLo-i91yjhYJshnDYy257M5hf/view?usp=sharing) and install it on your Android device
+  
 ## Table of Contents
 - [Building the project](#building-the-project)
 - [Usage](#usage)
