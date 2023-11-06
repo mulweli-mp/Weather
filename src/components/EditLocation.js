@@ -51,7 +51,7 @@ export default function EditLocation({
   const getSavedLocationsCurrentWeather = async () => {
     const savedWeatherData = await getSavedWeatherData();
     if (savedWeatherData) {
-      savedLocations = savedWeatherData.savedLocationsWeather;
+      const savedLocations = savedWeatherData.savedLocationsWeather;
       fetchWeatherForAllLocations(savedLocations)
         .then((weatherDataArray) => {
           setSavedLocationsWeatherData(weatherDataArray);
@@ -91,7 +91,6 @@ export default function EditLocation({
     return weatherData;
   };
 
-  // Function to fetch weather data for all locations and return a new array with weather data
   const fetchWeatherForAllLocations = async (locations) => {
     const weatherPromises = locations.map((location) =>
       fetchWeatherData(location.latitude, location.longitude)
