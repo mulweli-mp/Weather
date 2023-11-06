@@ -32,6 +32,7 @@ const SCREEN_WIDTH = Dimensions.get("window").width;
 export default function EditLocation({
   fetchWeatherForecast,
   setLocationModalVisible,
+  cancelManualSearch,
 }) {
   const [userWeatherData, updateUserWeatherData, deleteSavedLocation] =
     useContext(UserContext);
@@ -193,42 +194,6 @@ export default function EditLocation({
     setSavedLocationsWeatherData(currentPlaces);
   };
 
-  const data = {
-    currentLocationWeather: {
-      forecast5Days: [[Object], [Object], [Object], [Object], [Object]],
-      today: {
-        currentTemperature: 19,
-        description: "scattered clouds",
-        general: "cloudy",
-        latitude: -25.7511904417539,
-        longitude: 28.20508885346138,
-        main: "Clouds",
-        maxTemperature: 20,
-        minTemperature: 18,
-        placeName: "Arcadia",
-        timeUpdated: "2023-11-06T02:29:25.911Z",
-      },
-    },
-    savedLocationsWeather: [
-      {
-        currentTemperature: 19,
-        description: "scattered clouds",
-        general: "unknown",
-        latitude: -25.7511904417539,
-        longitude: 28.20508885346138,
-        placeName: "Arcadia",
-      },
-      {
-        currentTemperature: 19,
-        description: "clear sky",
-        general: "unknown",
-        latitude: -28.741382581666112,
-        longitude: 24.76215845169456,
-        placeName: "Kimberley",
-      },
-    ],
-  };
-
   const RenderItem = ({ item, isFirstItem }) => {
     let currentlyDisplayedLocation =
       !isFirstItem &&
@@ -270,7 +235,12 @@ export default function EditLocation({
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <TouchableOpacity
-            onPress={() => setLocationModalVisible(false)}
+            onPress={() => {
+              if (cancelManualSearch) {
+                cancelManualSearch();
+              }
+              setLocationModalVisible(false);
+            }}
             style={styles.closeButton}
           >
             <Ionicons name="close" size={28} color="white" />

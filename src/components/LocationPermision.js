@@ -7,13 +7,17 @@ import {
   Platform,
   Linking,
   AppState,
+  TouchableOpacity,
 } from "react-native";
 import LottieView from "lottie-react-native";
 import * as Location from "expo-location";
 
 import LoadingAnimation from "./LoadingAnimation";
 
-export default function LocationPermision({ fetchWeatherForecast }) {
+export default function LocationPermision({
+  fetchWeatherForecast,
+  searchManually,
+}) {
   const [isLoading, setIsLoading] = useState(true);
   const [gpsServiceOff, setGpsServiceOff] = useState(true);
   useState(false);
@@ -153,14 +157,19 @@ export default function LocationPermision({ fetchWeatherForecast }) {
         </>
       )}
 
-      <Button
+      <TouchableOpacity
         onPress={requestForegroundLocation}
-        color={"black"}
-        title={"Continue"}
-      />
+        style={styles.continueButton}
+      >
+        <Text style={styles.continueText}>CONTINUE</Text>
+      </TouchableOpacity>
 
-      <Text style={styles.rejectText} onPress={searchLocationManually}>
-        Manual Search
+      <Text
+        onPressIn={searchManually}
+        style={styles.rejectText}
+        onPress={searchLocationManually}
+      >
+        I will search manually
       </Text>
     </View>
   );
@@ -193,6 +202,21 @@ const styles = StyleSheet.create({
   rejectText: {
     fontWeight: "500",
     marginTop: 15,
-    color: "orange",
+    color: "#4287f5",
+  },
+  continueButton: {
+    backgroundColor: "black",
+    height: "7%",
+    width: "60%",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 7,
+    elevation: 5,
+    marginTop: 10,
+  },
+  continueText: {
+    fontWeight: "bold",
+    fontSize: 16,
+    color: "white",
   },
 });

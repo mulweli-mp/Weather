@@ -36,6 +36,7 @@ export default function Home({ navigation }) {
   const [isFetchingLocation, setIsFetchingLocation] = useState(true);
   const [lastUpdatedTime, setlastUpdatedTime] = useState("Just Now");
   const [errorMessage, setErrorMessage] = useState(null);
+  const [isSearchingManually, setIsSearchingManually] = useState(false);
 
   useEffect(() => {
     const subscription = AppState.addEventListener(
@@ -244,6 +245,7 @@ export default function Home({ navigation }) {
       }
 
       setIsFetchingLocation(false);
+      setIsSearchingManually(false);
 
       //Fetch data for current weather
       const currentWeatherResponse = await fetch(
@@ -319,6 +321,16 @@ export default function Home({ navigation }) {
     }
   };
 
+  const searchManually = () => {
+    setIsFetchingLocation(false);
+    setIsSearchingManually(true);
+    setLocationModalVisible(true);
+  };
+  const cancelManualSearch = () => {
+    setIsFetchingLocation(true);
+    setIsSearchingManually(false);
+  };
+
   if (errorMessage) {
     return (
       <DisplayError
@@ -331,7 +343,25 @@ export default function Home({ navigation }) {
     );
   }
   if (isFetchingLocation) {
-    return <LocationPermision fetchWeatherForecast={fetchWeatherForecast} />;
+    return (
+      <LocationPermision
+        fetchWeatherForecast={fetchWeatherForecast}
+        searchManually={searchManually}
+      />
+    );
+  }
+  if (isSearchingManually) {
+    return (
+      <View style={styles.container}>
+        {locationModalVisible && (
+          <EditLocation
+            fetchWeatherForecast={fetchWeatherForecast}
+            setLocationModalVisible={setLocationModalVisible}
+            cancelManualSearch={cancelManualSearch}
+          />
+        )}
+      </View>
+    );
   }
 
   if (isLoadingCurrent || isLoadingForecast) {
@@ -408,6 +438,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#303030",
   },
   currentWeatherContainer: {
     // backgroundColor: "red",
