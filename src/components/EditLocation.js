@@ -128,7 +128,6 @@ export default function EditLocation({
       query
     )}.json`;
 
-    const proximity = `${-25.7449},${28.1878}`;
     fetch(`${geocodingEndpoint}?access_token=${MAPBOX_ACCESS_TOKEN}`)
       .then((response) => response.json())
       .then((data) => {
