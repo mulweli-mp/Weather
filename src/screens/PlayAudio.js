@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import {
   StyleSheet,
@@ -16,45 +16,35 @@ import * as FileSystem from "expo-file-system";
 import { OPEN_WEATHER_API_KEY } from "@env";
 
 import { CustomStatusBar } from "../components";
-import readWeather from "../utilities/ReadWeather";
+import {
+  temperatureReadOutSounds,
+  readWeather,
+  weatherAudioData,
+} from "../utilities";
 
 const DEVICE_HEIGHT = Dimensions.get("window").height;
 
 export default function PlayAudio({ navigation }) {
-  const [sounds, setSounds] = useState([]);
-  const [reload, setReload] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
+  const sounds = useRef([]);
+
+  const [isLoading, setIsLoading] = useState(false);
   const [weatherReading, setWeatherReading] = useState(null);
+  const [readWeatherAudioData, setReadWeatherAudioData] = useState(null);
 
-  useEffect(() => {
-    loadSounds({
-      timeOfDay: "morning",
-      timeOfDayNumber: "1",
-      pre_temp: "3",
-      currentTempRead: "very_hot",
-      currentTemp: "10",
-      unit: "celcius",
-    });
-
-    // Unload sounds when component unmounts
-    return () => {
-      console.log("removing sounds");
-      setIsLoading(true);
-
-      sounds.forEach((sound) => {
-        sound.unloadAsync();
-      });
-    };
-  }, []);
-
-  const loadSounds = async (data) => {
+  const playWeatherAudio = async (data) => {
+    setIsLoading(true);
     const fileUri = FileSystem.documentDirectory;
 
+    let currentTempResolve = temperatureReadOutSounds(data.currentTemp);
+    currentTempResolve = currentTempResolve.map(
+      (number) => `${fileUri}${number}.mp3`
+    );
+
     const audioFiles = [
-      `${fileUri}${data.timeOfDay}${data.timeOfDayNumber}.mp3`,
-      `${fileUri}${data.timeOfDay}-pre_temp${data.pre_temp}.mp3`,
-      `${fileUri}${data.currentTempRead}.mp3`,
-      `${fileUri}${data.currentTemp}.mp3`,
+      `${fileUri}${data.timeOfDayDescription}${data.timeOfDayNumber}.mp3`,
+      `${fileUri}${data.timeOfDayDescription}-pre_temp${data.pre_temp}.mp3`,
+      `${fileUri}${data.currentTempDecription}.mp3`,
+      ...currentTempResolve,
       `${fileUri}${data.unit}.mp3`,
     ];
 
@@ -70,26 +60,27 @@ export default function PlayAudio({ navigation }) {
         })
       );
 
-      setSounds(loadedSounds);
+      // setSounds(loadedSounds);
+      sounds.current = loadedSounds;
       setIsLoading(false);
       console.log("sounds loaded");
+      playSoundAtIndex(0);
     } catch (error) {
       console.error("An error occurred:", error.message);
     }
   };
 
   const playSoundAtIndex = async (index) => {
-    if (index < sounds.length) {
-      const sound = sounds[index];
-
-      // Remove previous playback status listener
-      sound.setOnPlaybackStatusUpdate(null);
+    if (index < sounds.current?.length) {
+      const sound = sounds.current[index];
 
       // Set listener for playback status updates
       const statusListener = sound.setOnPlaybackStatusUpdate(async (status) => {
         if (status.didJustFinish) {
           // Play the next sound when the current sound finishes
           playSoundAtIndex(index + 1);
+          //Unload the sound once it is done playing
+          sound.unloadAsync();
         }
       });
 
@@ -120,8 +111,14 @@ export default function PlayAudio({ navigation }) {
       }
 
       const currentWeatherData = await currentWeatherResponse.json();
-      setWeatherReading(readWeather(currentWeatherData));
-      // console.log(`currentWeatherData:`, currentWeatherData);
+
+      const textReading = readWeather(currentWeatherData);
+      setWeatherReading(textReading);
+
+      const audioInput = weatherAudioData(currentWeatherData);
+      console.log(`audioInput:`, audioInput);
+      playWeatherAudio(audioInput);
+      setReadWeatherAudioData(audioInput);
     } catch (error) {
       alert(error.message);
     }
@@ -1105,17 +1102,11 @@ export default function PlayAudio({ navigation }) {
         </TouchableOpacity>
         <Text style={styles.titleText}>Play Audio</Text>
       </View>
-      {isLoading ? (
-        <ActivityIndicator size={"small"} color={"blue"} />
-      ) : (
+      {readWeatherAudioData && (
         <Button
           title="Play Audio"
           onPress={() => {
-            if (sounds.length > 0) {
-              playSoundAtIndex(0);
-            } else {
-              alert("Nothing to play here");
-            }
+            playWeatherAudio(readWeatherAudioData);
           }}
         />
       )}
