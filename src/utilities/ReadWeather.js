@@ -57,33 +57,36 @@ const getWeatherCategory = (weatherId) => {
 const readStructure = {
   greetings: {
     morning: [
-      "Ndi Matsheloni, ",
-      "Lotsha, ",
-      "He Ndaa! ",
       "Lotsha lotshela zwezwi nwana wa mukalaha ahuna na zwine, ",
+      "He Ndaa! ",
+      "Lotsha, ",
+      "Ndi Matsheloni, ",
     ],
-    afternoon: ["Ndi Masiari, ", "He Ndaaa! ", "Duvha lavhudi vhukuma, "],
+    afternoon: ["Duvha lavhudi vhukuma, ", "Ndi Masiari, "],
     evening: [
       "Lokovhela, ",
+      "Lokovhela, ", //Must replace
       "Ndi Madekwana, ",
-      "Ndia kholwa vhovha na duvha lavhudi, ",
+      //   "Ndia kholwa vhovha na duvha lavhudi, ", //Must record this
     ],
   },
   currentWeather: {
     morning: [
-      "Matsheloni a namusi huvhonala hutshinga hu khou ",
-      "Namusi lotsha nga hei ndila; zwazwino hu khou ",
+      "Huvhonala hutshinga hu khou ",
+      "Zwazwino hu khou vhonala mutsho wau ",
       "Arali vhonovha nnda, vhado zwipfa uri hu khou ",
+      "Matsheloni a namusi huvhonala hutshinga hu khou ",
+      //   "Namusi lotsha nga hei ndila; zwazwino hu khou ", //Must record this
     ],
     afternoon: [
-      "Masiari a namusi hu khou ",
-      "Masiari avhudi vhukuma na mutsho wau ",
       "Zwazwino hu khou ",
+      "Masiari avhudi vhukuma na mutsho wau ",
+      "Masiari a namusi hu khou ",
     ],
     evening: [
       "Madekwana a namusi hu khou ",
-      "Lokovhela zwavhudi vhukuma ngauri hu khou ",
-      "Madekwana ano hu khou ",
+      "Lokovhela zwavhudi vhukuma ngauri huvhonala hu khou ",
+      //   "Madekwana ano hu khou ", //Must record this
     ],
   },
   dayWeather: {
