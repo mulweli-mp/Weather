@@ -1,6 +1,13 @@
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import CustomStatusBar from "./CustomStatusBar";
+
+const DEVICE_HEIGHT = Dimensions.get("window").height;
 
 export default function HomeHeader({
   openDrawer,
@@ -9,7 +16,6 @@ export default function HomeHeader({
 }) {
   return (
     <View style={styles.container}>
-      <CustomStatusBar />
       <View style={styles.headerContextContainer}>
         <TouchableOpacity onPress={openDrawer} style={styles.menuButton}>
           <Ionicons name="menu" size={32} color="white" />
@@ -30,11 +36,11 @@ export default function HomeHeader({
 
 const styles = StyleSheet.create({
   container: {
-    // backgroundColor: "brown",
-    height: "23%",
+    // backgroundColor: "green",
+    minHeight: DEVICE_HEIGHT * 0.08,
     width: "100%",
-    position: "absolute",
-    top: 0,
+    // position: "absolute",
+    // top: 0,
   },
 
   menuButton: {
