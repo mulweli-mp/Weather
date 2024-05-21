@@ -13,7 +13,7 @@ function Navigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="PlayAudio"
+        initialRouteName="DrawerNavigation"
         screenOptions={{
           headerShown: false,
         }}
