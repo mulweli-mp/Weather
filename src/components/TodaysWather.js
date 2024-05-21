@@ -1,40 +1,61 @@
-import { StyleSheet, Text, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Dimensions,
+  ScrollView,
+  Image,
+} from "react-native";
+const DEVICE_HEIGHT = Dimensions.get("window").height;
+const DEVICE_WIDTH = Dimensions.get("window").width;
 
-export default function TodaysWather({ currentWeather }) {
+const itemDataStructure = {
+  clouds: 2,
+  dew_point: 11.89,
+  dt: 1716285600,
+  feels_like: 23.91,
+  humidity: 46,
+  pop: 0,
+  pressure: 1025,
+  temp: 24.23,
+  uvi: 6.93,
+  visibility: 10000,
+  weather: [{ description: "clear sky", icon: "01d", id: 800, main: "Clear" }],
+  wind_deg: 135,
+  wind_gust: 4.13,
+  wind_speed: 3.27,
+};
+
+export default function TodaysWather({ hourlyForecast }) {
+  const Item = ({ data }) => {
+    const date = new Date(data.dt * 1000);
+    let hour = date.getHours();
+    hour = hour < 10 ? `0${hour}` : hour;
+    hour = `${hour}:00`;
+    return (
+      <View style={styles.itemContainer}>
+        <Text style={styles.temperatureText}>{hour}</Text>
+        <Image
+          style={styles.iconStyle}
+          source={{
+            uri: `http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`,
+          }}
+        />
+        <Text style={styles.temperatureText}>{parseInt(data.temp)}°C</Text>
+      </View>
+    );
+  };
   return (
     <View style={styles.container}>
-      <View style={styles.reportBox}>
-        <Text style={styles.subTempText}>
-          {currentWeather.minTemperature}°C
-        </Text>
-        <Text style={styles.labelText}>min</Text>
-      </View>
-      <View
-        style={[
-          styles.reportBox,
-          {
-            alignItems: "center",
-          },
-        ]}
+      <ScrollView
+        contentContainerStyle={styles.scrollViewContainer}
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
       >
-        <Text style={styles.subTempText}>
-          {currentWeather.currentTemperature}°C
-        </Text>
-        <Text style={styles.labelText}>Current</Text>
-      </View>
-      <View
-        style={[
-          styles.reportBox,
-          {
-            alignItems: "flex-end",
-          },
-        ]}
-      >
-        <Text style={styles.subTempText}>
-          {currentWeather.maxTemperature}°C
-        </Text>
-        <Text style={styles.labelText}>max</Text>
-      </View>
+        {hourlyForecast.map((data, index) => (
+          <Item key={index + ""} data={data} />
+        ))}
+      </ScrollView>
     </View>
   );
 }
@@ -42,25 +63,37 @@ export default function TodaysWather({ currentWeather }) {
 const styles = StyleSheet.create({
   container: {
     // backgroundColor: "pink",
-    height: "18%",
+    height: DEVICE_HEIGHT * 0.17,
     width: "100%",
-    borderBlockColor: "white",
-    borderBottomWidth: 1,
-    flexDirection: "row",
-    paddingHorizontal: 20,
-  },
-  reportBox: {
-    // backgroundColor: "red",
-    flex: 1,
-    justifyContent: "center",
+    paddingRight: 5,
+    // justifyContent: "center",
     // alignItems: "center",
+  },
+  scrollViewContainer: {
+    // justifyContent: "center",
+    alignItems: "center",
+  },
+  itemContainer: {
+    // backgroundColor: "red",
+    // flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    height: "95%",
+    width: DEVICE_WIDTH * 0.175,
+    marginLeft: 5,
   },
   subTempText: {
     color: "white",
     fontWeight: "600",
     fontSize: 18,
   },
-  labelText: {
+  temperatureText: {
     color: "white",
+  },
+  iconStyle: {
+    // backgroundColor: "red",
+
+    width: DEVICE_HEIGHT * 0.09,
+    height: DEVICE_HEIGHT * 0.09,
   },
 });
