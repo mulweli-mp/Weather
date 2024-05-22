@@ -12,6 +12,7 @@ import {
   ScrollView,
   Platform,
   StatusBar,
+  Animated,
 } from "react-native";
 import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
@@ -58,6 +59,8 @@ export default function Home({ navigation }) {
   });
   const [readWeatherAudioData, setReadWeatherAudioData] = useState(null);
   const sounds = useRef([]);
+
+  const scrollY = new Animated.Value(0);
 
   // useEffect(() => {
   //   const subscription = AppState.addEventListener(
@@ -1497,7 +1500,7 @@ export default function Home({ navigation }) {
   }
 
   return (
-    <HomeLayout>
+    <HomeLayout scrollY={scrollY}>
       <HomeHeader
         openDrawer={() => navigation.openDrawer()}
         placeName={weatherForecast.placeName}
@@ -1508,6 +1511,11 @@ export default function Home({ navigation }) {
           alignItems: "center",
         }}
         showsVerticalScrollIndicator={false}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false } // Disable native driver for opacity animation
+        )}
+        scrollEventThrottle={16} // Control the rate at which onScroll events are fired
       >
         <View
           style={styles.currentWeatherContainer}
@@ -1570,6 +1578,12 @@ export default function Home({ navigation }) {
           />
         </View>
 
+        <View style={styles.forecastContainer}>
+          <View style={styles.forecastHeader}>
+            <Text style={styles.forecastHeaderText}>Daily Forecast</Text>
+          </View>
+          <ForecastWeather dailyForecast={weatherForecast.daily} />
+        </View>
         <View style={styles.forecastContainer}>
           <View style={styles.forecastHeader}>
             <Text style={styles.forecastHeaderText}>Daily Forecast</Text>

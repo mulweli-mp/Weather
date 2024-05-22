@@ -1,11 +1,11 @@
-import { StyleSheet, View, Dimensions, Image } from "react-native";
+import { StyleSheet, View, Dimensions, Image, Animated } from "react-native";
 
 import CustomStatusBar from "./CustomStatusBar";
 import bgTheme from "../utilities/BgTheme";
 
 const DEVICE_HEIGHT = Dimensions.get("window").height;
 
-export default function HomeLayout({ children }) {
+export default function HomeLayout({ children, scrollY }) {
   return (
     <View
       style={[
@@ -16,10 +16,21 @@ export default function HomeLayout({ children }) {
       ]}
     >
       <Image source={bgTheme.day.clear.image} style={styles.bgImage} />
-      <View style={styles.contentContainer}>
+      <Animated.View
+        style={[
+          styles.contentContainer,
+          {
+            backgroundColor: scrollY.interpolate({
+              inputRange: [0, 300],
+              outputRange: ["rgba(0,0,0,0.3)", "rgba(0,0,0,0.8)"],
+              extrapolate: "clamp",
+            }),
+          },
+        ]}
+      >
         <CustomStatusBar />
         {children}
-      </View>
+      </Animated.View>
     </View>
   );
 }
@@ -35,7 +46,6 @@ const styles = StyleSheet.create({
   contentContainer: {
     width: "100%",
     height: "100%",
-    backgroundColor: "rgba(0,0,0, 0.7)",
     position: "absolute",
   },
 });
