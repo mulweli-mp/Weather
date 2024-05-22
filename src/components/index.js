@@ -7,6 +7,7 @@ import EditLocation from "./EditLocation";
 import CustomStatusBar from "./CustomStatusBar";
 import DisplayError from "./DisplayError";
 import AddLocationMap from "./AddLocationMap";
+import AudioPlayer from "./AudioPlayer";
 
 export {
   HomeHeader,
@@ -18,4 +19,5 @@ export {
   CustomStatusBar,
   DisplayError,
   AddLocationMap,
+  AudioPlayer,
 };
