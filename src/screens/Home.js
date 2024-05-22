@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -13,6 +13,9 @@ import {
   Platform,
   StatusBar,
 } from "react-native";
+import { Audio } from "expo-av";
+import * as FileSystem from "expo-file-system";
+
 import { OPEN_WEATHER_API_KEY } from "@env";
 
 import { ThemeContext, UserContext } from "../context";
@@ -24,7 +27,9 @@ import {
   LocationPermision,
   EditLocation,
   DisplayError,
+  AudioPlayer,
 } from "../components";
+import { temperatureReadOutSounds, weatherAudioData } from "../utilities";
 import getSavedWeatherData from "../utilities/GetSavedWeatherData";
 import weatherCategories from "../utilities/WeatherCategories";
 import weatherImages from "../utilities/WeatherImages";
@@ -47,6 +52,12 @@ export default function Home({ navigation }) {
   const [lastUpdatedTime, setlastUpdatedTime] = useState("Just Now");
   const [errorMessage, setErrorMessage] = useState(null);
   const [isSearchingManually, setIsSearchingManually] = useState(false);
+  const [audioControls, setAudioControls] = useState({
+    isPlaying: false,
+    isSilent: false,
+  });
+  const [readWeatherAudioData, setReadWeatherAudioData] = useState(null);
+  const sounds = useRef([]);
 
   // useEffect(() => {
   //   const subscription = AppState.addEventListener(
@@ -380,13 +391,89 @@ export default function Home({ navigation }) {
         placeName: "Makonde",
       });
 
-      // let weatherDataFomart = {};
-      // weatherDataFomart = { ...currentWeatherData.current };
-      console.log(`currentWeatherData:`, currentWeatherData.daily[0]);
+      const audioInput = weatherAudioData(currentWeatherData);
+      console.log(`audioInput:`, audioInput);
+      playWeatherAudio(audioInput);
+      setReadWeatherAudioData(audioInput);
+
       setIsLoading(false);
     } catch (error) {
       alert(error.message);
       setIsLoading(false);
+    }
+  };
+
+  const playWeatherAudio = async (audioInput) => {
+    const data = audioInput ? audioInput : readWeatherAudioData;
+    if (!data) {
+      alert("Audio could not play");
+      return;
+    }
+    const fileUri = FileSystem.documentDirectory;
+
+    let currentTempResolve = temperatureReadOutSounds(data.currentTemp);
+    currentTempResolve = currentTempResolve.map(
+      (number) => `${fileUri}${number}.mp3`
+    );
+
+    const audioFiles = [
+      `${fileUri}${data.timeOfDayDescription}${data.timeOfDayNumber}.mp3`,
+      `${fileUri}${data.timeOfDayDescription}-pre_temp${data.pre_temp}.mp3`,
+      `${fileUri}${data.currentTempDecription}.mp3`,
+      ...currentTempResolve,
+      `${fileUri}${data.unit}.mp3`,
+    ];
+
+    console.log("loading sounds");
+    try {
+      const loadedSounds = await Promise.all(
+        audioFiles.map(async (localAudioUri) => {
+          console.log("localAudioUri", localAudioUri);
+          const { sound } = await Audio.Sound.createAsync({
+            uri: localAudioUri,
+          });
+          return sound;
+        })
+      );
+
+      // setSounds(loadedSounds);
+      sounds.current = loadedSounds;
+      // setIsLoading(false);
+      console.log("sounds loaded");
+      playSoundAtIndex(0);
+    } catch (error) {
+      console.error("An error occurred:", error.message);
+    }
+  };
+
+  const playSoundAtIndex = async (index) => {
+    if (index < sounds.current?.length) {
+      const sound = sounds.current[index];
+
+      // Set listener for playback status updates
+      const statusListener = sound.setOnPlaybackStatusUpdate(async (status) => {
+        if (status.didJustFinish) {
+          // Play the next sound when the current sound finishes
+          playSoundAtIndex(index + 1);
+          //Unload the sound once it is done playing
+          sound.unloadAsync();
+        }
+      });
+
+      // Play the current sound
+      await sound.replayAsync();
+      const controlsState = audioControls;
+      setAudioControls({
+        ...controlsState,
+        isPlaying: true,
+      });
+    } else {
+      // alert("done playing");
+      const controlsState = audioControls;
+      setAudioControls({
+        ...controlsState,
+        isPlaying: false,
+      });
     }
   };
 
@@ -1476,6 +1563,11 @@ export default function Home({ navigation }) {
             <Text style={styles.forecastHeaderText}>Hourly Forecast</Text>
           </View>
           <TodaysWather hourlyForecast={weatherForecast.hourly} />
+          <AudioPlayer
+            playWeatherAudio={playWeatherAudio}
+            audioControls={audioControls}
+            setAudioControls={setAudioControls}
+          />
         </View>
 
         <View style={styles.forecastContainer}>
@@ -1484,8 +1576,6 @@ export default function Home({ navigation }) {
           </View>
           <ForecastWeather dailyForecast={weatherForecast.daily} />
         </View>
-        {/* <View style={styles.forecastContainer}></View> */}
-        {/* <View style={styles.forecastContainer}></View> */}
       </ScrollView>
 
       {locationModalVisible && (
@@ -1520,6 +1610,8 @@ const styles = StyleSheet.create({
     marginTop: 5,
     borderRadius: 9,
     marginBottom: DEVICE_HEIGHT * 0.03,
+    alignItems: "center",
+    // justifyContent: "space-between",
   },
   temperatureText: {
     color: "white",
