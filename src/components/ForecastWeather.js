@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
 
   dayContainer: {
     // backgroundColor: "yellow",
-    width: "25%",
+    width: "30%",
     height: "100%",
     // alignItems: "center",
     justifyContent: "center",
