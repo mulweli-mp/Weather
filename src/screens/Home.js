@@ -1500,7 +1500,10 @@ export default function Home({ navigation }) {
   }
 
   return (
-    <HomeLayout scrollY={scrollY}>
+    <HomeLayout
+      theme={weatherForecast.current.weather[0].icon}
+      scrollY={scrollY}
+    >
       <HomeHeader
         openDrawer={() => navigation.openDrawer()}
         placeName={weatherForecast.placeName}
