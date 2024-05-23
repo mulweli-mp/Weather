@@ -5,17 +5,20 @@ import bgTheme from "../utilities/BgTheme";
 
 const DEVICE_HEIGHT = Dimensions.get("window").height;
 
-export default function HomeLayout({ children, scrollY }) {
+export default function HomeLayout({ children, scrollY, theme }) {
   return (
     <View
       style={[
         styles.container,
         {
-          backgroundColor: bgTheme.day.clear.colour,
+          backgroundColor: bgTheme.naturesCanvas[theme].colour,
         },
       ]}
     >
-      <Image source={bgTheme.day.clear.image} style={styles.bgImage} />
+      <Image
+        source={bgTheme.naturesCanvas[theme].image}
+        style={styles.bgImage}
+      />
       <Animated.View
         style={[
           styles.contentContainer,
