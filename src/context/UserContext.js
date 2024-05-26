@@ -6,10 +6,7 @@ export const UserContext = createContext();
 
 export const UserProvider = (props) => {
   const [userWeatherData, setUserWeatherData] = useState({
-    currentLocationWeather: {
-      today: {},
-      forecast5Days: [],
-    },
+    currentLocationWeather: {},
     savedLocationsWeather: [],
   });
 
@@ -34,9 +31,9 @@ export const UserProvider = (props) => {
     );
   };
 
-  const updateUserWeatherData = (newData) => {
-    const { today, forecast5Days } = newData;
-    const { placeName, latitude, longitude } = today;
+  const updateUserWeatherData = (weatherForecast) => {
+    // const { today, forecast5Days } = weatherForecast;
+    const { placeName, latitude, longitude } = weatherForecast;
 
     let savedLocations = userWeatherData.savedLocationsWeather;
     if (!placeAlreadySaved(savedLocations, placeName)) {
@@ -49,10 +46,7 @@ export const UserProvider = (props) => {
     }
 
     let newWeatherData = {
-      currentLocationWeather: {
-        today,
-        forecast5Days,
-      },
+      currentLocationWeather: weatherForecast,
       savedLocationsWeather: savedLocations,
     };
 
