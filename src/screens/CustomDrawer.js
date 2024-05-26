@@ -12,15 +12,16 @@ import { Ionicons, Entypo } from "@expo/vector-icons";
 
 import { UserContext, ThemeContext } from "../context";
 
-import weatherImages from "../utilities/WeatherImages";
+import bgTheme from "../utilities/BgTheme";
 
 const DEVICE_HEIGHT = Dimensions.get("window").height;
 
 export default function CustomDrawer({ navigation }) {
   const [userWeatherData] = useContext(UserContext);
-  const [themeColors] = useContext(ThemeContext);
+  // const [themeColors] = useContext(ThemeContext); Will be used in future to handle theme selection e.g naturesCanvas
 
-  const currentWeather = userWeatherData.currentLocationWeather.today;
+  const weatherForecast = userWeatherData.currentLocationWeather;
+  const theme = weatherForecast.current?.weather[0].icon;
 
   const menuOptions = [
     {
@@ -39,20 +40,26 @@ export default function CustomDrawer({ navigation }) {
   ];
 
   return (
-    <View style={styles.container}>
-      {currentWeather.currentTemperature && (
-        //App crashes if this is false because of toUpperCase() below
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: bgTheme.naturesCanvas[theme]?.colour,
+        },
+      ]}
+    >
+      {weatherForecast.current && (
         <ImageBackground
           style={styles.currentWeatherContainer}
-          source={weatherImages[themeColors.theme][currentWeather.general]}
+          source={bgTheme.naturesCanvas[theme].image}
           resizeMode="cover"
         >
-          <Text style={styles.placetext}>{currentWeather.placeName}</Text>
+          <Text style={styles.placetext}>{weatherForecast.placeName}</Text>
           <Text style={styles.temperatureText}>
-            {currentWeather.currentTemperature}°C
+            {Math.round(weatherForecast.current.temp)}°C
           </Text>
           <Text style={styles.weatherDescriptionText}>
-            {currentWeather.description.toUpperCase()}
+            {weatherForecast.current.weather[0].description}
           </Text>
         </ImageBackground>
       )}
