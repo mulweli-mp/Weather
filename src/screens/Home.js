@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, useRef } from "react";
+import { useContext, useState, useEffect, useRef, useCallback } from "react";
 import {
   StyleSheet,
   Text,
@@ -13,12 +13,12 @@ import {
   Platform,
   StatusBar,
   Animated,
+  RefreshControl,
 } from "react-native";
 import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
 
-import { OPEN_WEATHER_API_KEY } from "@env";
-
+import { OPEN_WEATHER_API_KEY, GOOGLE_MAPS_APIKEY } from "@env";
 import { ThemeContext, UserContext } from "../context";
 import {
   HomeHeader,
@@ -33,7 +33,6 @@ import {
 import { temperatureReadOutSounds, weatherAudioData } from "../utilities";
 import getSavedWeatherData from "../utilities/GetSavedWeatherData";
 import weatherCategories from "../utilities/WeatherCategories";
-import weatherImages from "../utilities/WeatherImages";
 import HomeLayout from "../components/HomeLayout";
 
 const DEVICE_HEIGHT = Dimensions.get("window").height;
@@ -43,6 +42,7 @@ export default function Home({ navigation }) {
   const [themeColors] = useContext(ThemeContext);
   const [userWeatherData, updateUserWeatherData] = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [weatherForecast, setWeatherForecast] = useState(null);
   const [isLoadingCurrent, setIsLoadingCurrent] = useState(true);
   const [isLoadingForecast, setIsLoadingForecast] = useState(true);
@@ -61,6 +61,15 @@ export default function Home({ navigation }) {
   const sounds = useRef([]);
 
   const scrollY = new Animated.Value(0);
+
+  const onRefresh = () => {
+    fetchWeatherForecastII({
+      latitude: weatherForecast.latitude,
+      longitude: weatherForecast.longitude,
+      placeName: weatherForecast.placeName,
+      silentRefresh: true,
+    });
+  };
 
   // useEffect(() => {
   //   const subscription = AppState.addEventListener(
@@ -359,19 +368,16 @@ export default function Home({ navigation }) {
   };
 
   const fetchWeatherForecastII = async (data) => {
-    setIsLoading(true);
     const currentWeatherApiUrl =
       "https://api.openweathermap.org/data/3.0/onecall";
-
-    const { latitude, longitude } = data;
+    const { latitude, longitude, silentRefresh, placeName } = data;
 
     try {
-      // if (!silentRefresh) {
-      //   //silentRefresh is important to keep the offline mode persistent
-      //   //If the weather information is outdated, we need to have the ability to refresh it without clearing data on screen
-      //   setIsLoadingCurrent(true);
-      //   setIsLoadingForecast(true);
-      // }
+      if (silentRefresh) {
+        setRefreshing(true);
+      } else {
+        setIsLoading(true);
+      }
 
       setIsFetchingLocation(false);
       setIsSearchingManually(false);
@@ -381,28 +387,51 @@ export default function Home({ navigation }) {
       );
 
       if (!currentWeatherResponse.ok) {
-        alert(
+        throw new Error(
           "Something went wrong fetching weather data. Please try again later"
         );
-        setIsLoading(false);
       }
 
       const currentWeatherData = await currentWeatherResponse.json();
+
+      let resolvedPlaceName = placeName;
+      if (!resolvedPlaceName) {
+        const placeResponse = await fetch(
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${GOOGLE_MAPS_APIKEY}`
+        );
+
+        if (!placeResponse.ok) {
+          throw new Error(
+            "Something went wrong fetching place data. Please try again later"
+          );
+        }
+
+        const placeData = await placeResponse.json();
+        const filteredArray = placeData.results.filter(
+          (obj) => !obj.hasOwnProperty("plus_code")
+        );
+
+        if (filteredArray.length > 0) {
+          const address = filteredArray[0].formatted_address;
+          const placeComponents = address.split(",");
+          resolvedPlaceName = placeComponents[1].trim();
+        } else {
+          resolvedPlaceName = "Unknown Location";
+        }
+      }
+
       setWeatherForecast({
         ...currentWeatherData,
         ...data,
-        placeName: "Makonde",
+        placeName: resolvedPlaceName,
       });
 
-      const audioInput = weatherAudioData(currentWeatherData);
-      console.log(`audioInput:`, audioInput);
-      playWeatherAudio(audioInput);
-      setReadWeatherAudioData(audioInput);
-
       setIsLoading(false);
+      setRefreshing(false);
     } catch (error) {
       alert(error.message);
       setIsLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -1519,6 +1548,9 @@ export default function Home({ navigation }) {
           { useNativeDriver: false } // Disable native driver for opacity animation
         )}
         scrollEventThrottle={16} // Control the rate at which onScroll events are fired
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         <View
           style={styles.currentWeatherContainer}
@@ -1581,12 +1613,6 @@ export default function Home({ navigation }) {
           />
         </View>
 
-        <View style={styles.forecastContainer}>
-          <View style={styles.forecastHeader}>
-            <Text style={styles.forecastHeaderText}>Daily Forecast</Text>
-          </View>
-          <ForecastWeather dailyForecast={weatherForecast.daily} />
-        </View>
         <View style={styles.forecastContainer}>
           <View style={styles.forecastHeader}>
             <Text style={styles.forecastHeaderText}>Daily Forecast</Text>
