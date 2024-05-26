@@ -127,14 +127,14 @@ export default function Home({ navigation }) {
       if (minutesDifference < 2) {
         lastUpdateString = "Just Now";
       } else if (minutesDifference > 2 && minutesDifference < 60) {
-        lastUpdateString = `${parseInt(minutesDifference)} mins ago`;
+        lastUpdateString = `${Math.round(minutesDifference)} mins ago`;
       } else {
         const hoursDifference = minutesDifference / 60;
         if (hoursDifference < 24) {
           lastUpdateString =
-            parseInt(hoursDifference) == 1
+            Math.round(hoursDifference) == 1
               ? "an hour ago"
-              : `${parseInt(hoursDifference)} hours ago`;
+              : `${Math.round(hoursDifference)} hours ago`;
         } else {
           const dateUpdated = new Date(currentWeather?.timeUpdated);
           lastUpdateString = `${dateUpdated}`.substring(0, 21);
@@ -1567,16 +1567,16 @@ export default function Home({ navigation }) {
             )}
           </Text>
           <Text style={styles.temperatureText}>
-            {parseInt(weatherForecast.current.temp)}°C
+            {Math.round(weatherForecast.current.temp)}°C
           </Text>
 
           <View style={styles.tempRangeContainer}>
             <Text style={styles.miniDescriptionText}>
-              Feels like: {parseInt(weatherForecast.current.feels_like)}°C
+              Feels like: {Math.round(weatherForecast.current.feels_like)}°C
             </Text>
             <Text style={styles.miniDescriptionText}>
-              {parseInt(weatherForecast.daily[0].temp.min)}°/
-              {parseInt(weatherForecast.daily[0].temp.max)}°
+              {Math.round(weatherForecast.daily[0].temp.min)}°/
+              {Math.round(weatherForecast.daily[0].temp.max)}°
             </Text>
           </View>
 

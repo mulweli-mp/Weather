@@ -97,7 +97,7 @@ export default function ForecastWeather({ dailyForecast }) {
         </View>
         <View style={styles.tempContainer}>
           <Text style={styles.generalText}>
-            {parseInt(data.temp.min)}°/{parseInt(data.temp.max)}°
+            {Math.round(data.temp.min)}°/{Math.round(data.temp.max)}°
           </Text>
         </View>
       </View>

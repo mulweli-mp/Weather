@@ -120,7 +120,7 @@ export default weatherAudioData = (data) => {
     timeOfDayNumber: getRandomIntro(readStructure.greetings[timeOfDay]),
     pre_temp: getRandomIntro(readStructure.currentWeather[timeOfDay]),
     currentTempDecription: currentTempRead,
-    currentTemp: parseInt(data.current.temp),
+    currentTemp: Math.round(data.current.temp),
     unit: "celcius",
   };
 

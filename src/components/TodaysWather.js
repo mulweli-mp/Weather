@@ -41,7 +41,7 @@ export default function TodaysWather({ hourlyForecast }) {
             uri: `http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`,
           }}
         />
-        <Text style={styles.temperatureText}>{parseInt(data.temp)}°C</Text>
+        <Text style={styles.temperatureText}>{Math.round(data.temp)}°C</Text>
       </View>
     );
   };
