@@ -24,15 +24,15 @@ export default function LocationPermision({
   const [canAskAgain, setCanAskAgain] = useState(true);
 
   useEffect(() => {
-    const subscription = AppState.addEventListener(
-      "change",
-      _handleAppStateChange
-    );
+    // const subscription = AppState.addEventListener(
+    //   "change",
+    //   _handleAppStateChange
+    // );
     getLocationPermision();
 
-    return () => {
-      subscription.remove();
-    };
+    // return () => {
+    //   subscription.remove();
+    // };
   }, []);
 
   const _handleAppStateChange = (nextAppState) => {
@@ -63,6 +63,8 @@ export default function LocationPermision({
   };
 
   const getUserLocation = async () => {
+    console.log("getUserLocation");
+
     let location = await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.Balanced,
     });
