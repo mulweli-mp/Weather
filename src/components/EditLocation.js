@@ -70,36 +70,27 @@ export default function EditLocation({
     }
   };
 
-  const fetchWeatherData = async (latitude, longitude) => {
+  const fetchWeatherDataII = async (latitude, longitude) => {
     const currentWeatherApiUrl =
-      "https://api.openweathermap.org/data/2.5/weather";
-    const response = await fetch(
-      `${currentWeatherApiUrl}?lat=${latitude}&lon=${longitude}&appid=${OPEN_WEATHER_API_KEY}&units=metric`
+      "https://api.openweathermap.org/data/3.0/onecall";
+    const currentWeatherResponse = await fetch(
+      `${currentWeatherApiUrl}?lat=${latitude}&lon=${longitude}&appid=${OPEN_WEATHER_API_KEY}&units=metric&exclude=minutely,alerts`
     );
 
-    if (!response.ok) {
-      throw new Error("Weather data request failed.");
+    if (!currentWeatherResponse.ok) {
+      throw new Error(
+        "Something went wrong fetching weather data. Please try again later"
+      );
     }
 
-    const data = await response.json();
-    const { main, weather } = data;
-    const { temp } = main;
-    const { main: weatherMain, description } = weather[0];
+    const currentWeatherData = await currentWeatherResponse.json();
 
-    const general = weatherCategories[weatherMain] || "unknown";
-    const currentTemperature = Math.round(temp);
-
-    const weatherData = {
-      general,
-      description,
-      currentTemperature,
-    };
-    return weatherData;
+    return currentWeatherData.current;
   };
 
   const fetchWeatherForAllLocations = async (locations) => {
     const weatherPromises = locations.map((location) =>
-      fetchWeatherData(location.latitude, location.longitude)
+      fetchWeatherDataII(location.latitude, location.longitude)
     );
 
     try {
@@ -123,7 +114,7 @@ export default function EditLocation({
   };
 
   const searchPlaces = (query) => {
-    console.log(`MAPBOX_ACCESS_TOKEN:`, MAPBOX_ACCESS_TOKEN);
+    // console.log(`MAPBOX_ACCESS_TOKEN:`, MAPBOX_ACCESS_TOKEN);
     setIsLoadingSearchResults(true);
     const geocodingEndpoint = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
       query
@@ -199,33 +190,45 @@ export default function EditLocation({
   const RenderItem = ({ item, isFirstItem }) => {
     let currentlyDisplayedLocation =
       !isFirstItem &&
-      userWeatherData.currentLocationWeather.today.placeName === item.placeName;
+      userWeatherData?.currentLocationWeather?.placeName === item.placeName;
 
     if (currentlyDisplayedLocation) {
       //Remove duplicate location that is already in ListHeaderComponent
       return null;
     }
+
+    let locationData = item;
+
+    if (isFirstItem) {
+      locationData = savedLocationsWeatherData.find(
+        (location) => location.placeName === item.placeName
+      );
+    }
     return (
       <TouchableOpacity
         onPress={() => onTapLocation(item)}
-        onLongPress={() => showDeleteAlert(item.placeName, isFirstItem)}
+        onLongPress={() => showDeleteAlert(locationData.placeName, isFirstItem)}
         style={styles.savedPlaceContainer}
       >
         <View style={styles.aboutLocation}>
           <Text numberOfLines={2} style={styles.tempText}>
-            {item.placeName}
+            {locationData.placeName}
           </Text>
         </View>
         <View style={styles.locationsWeather}>
           <View style={styles.tempContainer}>
             <Image
               style={styles.weatherImage}
-              source={weatherIcons[item.general]}
+              source={{
+                uri: `http://openweathermap.org/img/wn/${locationData.weather[0].icon}@2x.png`,
+              }}
             />
-            <Text style={styles.tempText}>{item.currentTemperature}°C</Text>
+            <Text style={styles.tempText}>
+              {Math.round(locationData.temp)}°C
+            </Text>
           </View>
           <Text numberOfLines={2} style={styles.descriptionText}>
-            {item.description}
+            {locationData.weather[0].description}
           </Text>
         </View>
       </TouchableOpacity>
@@ -307,10 +310,14 @@ export default function EditLocation({
             <FlatList
               data={savedLocationsWeatherData}
               ListHeaderComponent={() =>
-                userWeatherData.currentLocationWeather.today
-                  .currentTemperature && (
+                //This is to make sure that the location displayed at home page is always at the top here
+                //And that it can not be deleted
+                userWeatherData?.currentLocationWeather.current?.temp && (
                   <RenderItem
-                    item={userWeatherData.currentLocationWeather.today}
+                    item={{
+                      placeName:
+                        userWeatherData.currentLocationWeather.placeName,
+                    }}
                     isFirstItem={true}
                   />
                 )
@@ -481,7 +488,7 @@ const styles = StyleSheet.create({
     color: "white",
   },
   weatherImage: {
-    height: 25,
-    width: 25,
+    height: 50,
+    width: 50,
   },
 });
