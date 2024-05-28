@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import { darkMode } from "../utilities/MapStyle";
 
 import { OPEN_WEATHER_API_KEY } from "@env";
 
@@ -46,36 +47,27 @@ export default function SavedLocations({ navigation }) {
     }
   };
 
-  const fetchWeatherData = async (latitude, longitude) => {
+  const fetchWeatherDataII = async (latitude, longitude) => {
     const currentWeatherApiUrl =
-      "https://api.openweathermap.org/data/2.5/weather";
-    const response = await fetch(
-      `${currentWeatherApiUrl}?lat=${latitude}&lon=${longitude}&appid=${OPEN_WEATHER_API_KEY}&units=metric`
+      "https://api.openweathermap.org/data/3.0/onecall";
+    const currentWeatherResponse = await fetch(
+      `${currentWeatherApiUrl}?lat=${latitude}&lon=${longitude}&appid=${OPEN_WEATHER_API_KEY}&units=metric&exclude=minutely,alerts`
     );
 
-    if (!response.ok) {
-      throw new Error("Weather data request failed.");
+    if (!currentWeatherResponse.ok) {
+      throw new Error(
+        "Something went wrong fetching weather data. Please try again later"
+      );
     }
 
-    const data = await response.json();
-    const { main, weather } = data;
-    const { temp } = main;
-    const { main: weatherMain, description } = weather[0];
+    const currentWeatherData = await currentWeatherResponse.json();
 
-    const general = weatherCategories[weatherMain] || "unknown";
-    const currentTemperature = Math.round(temp);
-
-    const weatherData = {
-      general,
-      description,
-      currentTemperature,
-    };
-    return weatherData;
+    return currentWeatherData.current;
   };
 
   const fetchWeatherForAllLocations = async (locations) => {
     const weatherPromises = locations.map((location) =>
-      fetchWeatherData(location.latitude, location.longitude)
+      fetchWeatherDataII(location.latitude, location.longitude)
     );
 
     try {
@@ -135,29 +127,24 @@ export default function SavedLocations({ navigation }) {
             provider={PROVIDER_GOOGLE}
             ref={mapViewRef}
             style={styles.map}
+            customMapStyle={darkMode}
           >
-            {savedLocationsWeatherData.map(
-              ({
-                placeName,
-                currentTemperature,
-                description,
-                latitude,
-                longitude,
-              }) => (
-                <Marker
-                  coordinate={{
-                    latitude,
-                    longitude,
-                  }}
-                  title={placeName}
-                  description={`${currentTemperature}°C, ${description}`}
-                  identifier={placeName}
-                  key={placeName}
-                >
-                  <CustomPin />
-                </Marker>
-              )
-            )}
+            {savedLocationsWeatherData.map((item) => (
+              <Marker
+                coordinate={{
+                  latitude: item.latitude,
+                  longitude: item.longitude,
+                }}
+                title={item.placeName}
+                description={`${Math.round(item.temp)}°C, ${
+                  item.weather[0].description
+                }`}
+                identifier={item.placeName}
+                key={item.placeName}
+              >
+                <CustomPin />
+              </Marker>
+            ))}
           </MapView>
         </>
       )}
