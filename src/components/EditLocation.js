@@ -21,8 +21,6 @@ import { MAPBOX_ACCESS_TOKEN, OPEN_WEATHER_API_KEY } from "@env";
 
 import { UserContext } from "../context";
 
-import weatherIcons from "../utilities/WeatherIcons";
-import weatherCategories from "../utilities/WeatherIcons";
 import getSavedWeatherData from "../utilities/GetSavedWeatherData";
 import AddLocationMap from "./AddLocationMap";
 
