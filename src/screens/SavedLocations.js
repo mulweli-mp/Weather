@@ -88,9 +88,9 @@ export default function SavedLocations({ navigation }) {
       mapViewRef.current.fitToSuppliedMarkers(markersRefs, {
         edgePadding: {
           top: DEVICE_HEIGHT * 0.15,
-          right: DEVICE_HEIGHT * 0.08,
-          bottom: DEVICE_HEIGHT * 0.35,
-          left: DEVICE_HEIGHT * 0.08,
+          right: DEVICE_HEIGHT * 0.15,
+          bottom: DEVICE_HEIGHT * 0.15,
+          left: DEVICE_HEIGHT * 0.15,
         },
       });
     }
