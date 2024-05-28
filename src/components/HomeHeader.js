@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 
 const DEVICE_HEIGHT = Dimensions.get("window").height;
 
@@ -27,7 +27,7 @@ export default function HomeHeader({
           <Text numberOfLines={2} style={styles.locationText}>
             {placeName}
           </Text>
-          <Ionicons name="ios-chevron-down" size={20} color="white" />
+          <MaterialIcons name="expand-more" size={24} color="white" />
         </TouchableOpacity>
       </View>
     </View>
