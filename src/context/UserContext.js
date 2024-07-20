@@ -23,12 +23,10 @@ export const UserProvider = (props) => {
       const savedData = await getSavedWeatherData();
       let savedLocations = [];
       if (savedData) {
-        setUserWeatherData(savedData);
         savedLocations = savedData.savedLocationsWeather;
       }
 
       if (!placeAlreadySaved(savedLocations, placeName)) {
-        let savedLocations = savedData.savedLocationsWeather;
         savedLocations.push({
           placeName,
           latitude,
