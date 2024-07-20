@@ -44,6 +44,11 @@ export default function SavedLocations({ navigation }) {
           alert(error.message);
           setIsLoadingSavedLocations(false);
         });
+    } else {
+      setIsLoadingSavedLocations(false);
+      setTimeout(() => {
+        alert("You have no saved locations");
+      }, 2000);
     }
   };
 
