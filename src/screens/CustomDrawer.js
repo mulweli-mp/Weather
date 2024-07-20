@@ -24,12 +24,12 @@ export default function CustomDrawer({ navigation }) {
   const theme = weatherForecast.current?.weather[0].icon;
 
   const menuOptions = [
-    {
-      optionName: "Theme",
-      key: "theme",
-      navigationScreen: "Settings",
-      iconName: "settings-outline",
-    },
+    // {
+    //   optionName: "Theme",
+    //   key: "theme",
+    //   navigationScreen: "Settings",
+    //   iconName: "settings-outline",
+    // },
 
     {
       optionName: "Saved Locations",
@@ -111,8 +111,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   menuButton: {
-    backgroundColor: "#404040",
-
+    backgroundColor: "rgba(0,0,0, 0.3)",
     height: DEVICE_HEIGHT * 0.06,
     width: "98%",
     marginTop: 7,
