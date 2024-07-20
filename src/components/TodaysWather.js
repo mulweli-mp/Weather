@@ -38,7 +38,7 @@ export default function TodaysWather({ hourlyForecast }) {
         <Image
           style={styles.iconStyle}
           source={{
-            uri: `http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`,
+            uri: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`,
           }}
         />
         <Text style={styles.temperatureText}>{Math.round(data.temp)}°C</Text>

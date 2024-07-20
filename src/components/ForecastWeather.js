@@ -88,7 +88,7 @@ export default function ForecastWeather({ dailyForecast }) {
           <Image
             style={styles.iconStyle}
             source={{
-              uri: `http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`,
+              uri: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`,
             }}
           />
         </View>

@@ -218,7 +218,7 @@ export default function EditLocation({
             <Image
               style={styles.weatherImage}
               source={{
-                uri: `http://openweathermap.org/img/wn/${locationData.weather[0].icon}@2x.png`,
+                uri: `https://openweathermap.org/img/wn/${locationData.weather[0].icon}@2x.png`,
               }}
             />
             <Text style={styles.tempText}>
