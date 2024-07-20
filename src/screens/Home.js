@@ -454,11 +454,11 @@ export default function Home({ navigation }) {
             <Text style={styles.forecastHeaderText}>Hourly Forecast</Text>
           </View>
           <TodaysWather hourlyForecast={weatherForecast.hourly} />
-          <AudioPlayer
+          {/* <AudioPlayer
             playWeatherAudio={playWeatherAudio}
             audioControls={audioControls}
             setAudioControls={setAudioControls}
-          />
+          /> */}
         </View>
 
         <View style={styles.forecastContainer}>
@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
   forecastContainer: {
     backgroundColor: "rgba(0,0,0,0.2)",
     width: "95%",
-    minHeight: DEVICE_HEIGHT * 0.35,
+    minHeight: DEVICE_HEIGHT * 0.25,
     marginTop: 5,
     borderRadius: 9,
     marginBottom: DEVICE_HEIGHT * 0.03,
